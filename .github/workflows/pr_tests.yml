@@ -1,52 +1,23 @@
-name: PR - Unity Tests
+name: 🧪 Tests
 
-on:
-  pull_request:
-    branches:
-      - main
-      - develop
+on: push
 
 env:
-  UNITY_VERSION: 2023.2.14f1 # <<< IMPORTANT: Set your exact Unity version here
-  PROJECT_PATH: . # <<< IMPORTANT: Path to your Unity project root (e.g., ".")
+  UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
 
 jobs:
-  test:
-    name: Run Unity Tests on PR
+  TestRunner:
+    name: Tests
     runs-on: ubuntu-latest
+    timeout-minutes: 5
+    container:
+      image: "unityci/editor:ubuntu-6000.0.47f1-base-3.1.0"
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          lfs: true
-
-      - name: Cache Unity Library
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.PROJECT_PATH }}/Library
-          # FIX: Corrected path construction for hashFiles
-          key: Unity-Library-${{ env.UNITY_VERSION }}-${{ hashFiles(env.PROJECT_PATH, '/**') }}
-          restore-keys: |
-            Unity-Library-${{ env.UNITY_VERSION }}-
-
-      - name: Set up Unity
-        uses: game-ci/unity-setup@v4
-        with:
-          unity-version: ${{ env.UNITY_VERSION }}
-          unity-license: ${{ secrets.UNITY_LICENSE }}
-
-      - name: Run Unity Tests
-        uses: game-ci/unity-test-runner@v2
-        with:
-          projectPath: ${{ env.PROJECT_PATH }}
-          unityVersion: ${{ env.UNITY_VERSION }}
-          testMode: all
-          artifactsPath: ${{ github.workspace }}/artifacts/tests
-
-      - name: Upload Test Results Artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: pr-test-results
-          path: ${{ github.workspace }}/artifacts/tests
-          retention-days: 5
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      - name: Activate Unity
+        run: echo "$UNITY_LICENSE" > Unity_lic.ulf && (/opt/unity/Editor/Unity -nographics -batchmode -manualLicenseFile Unity_lic.ulf || true)
+      - name: Edit Mode Tests
+        run: /opt/unity/Editor/Unity -projectPath . -batchmode -nographics -runTests -testPlatform EditMode -retry 3
+      - name: Play Mode Tests
+        run: /opt/unity/Editor/Unity -projectPath . -batchmode -nographics -runTests -testPlatform PlayMode -retry 3

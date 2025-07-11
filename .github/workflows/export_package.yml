@@ -2,112 +2,75 @@ name: Unity Package Export & Release
 
 on:
   push:
-    branches:
-      - main # Trigger on push to the main branch
+    branches: [main]
 
 env:
-  UNITY_VERSION: 2023.2.14f1 # <<< IMPORTANT: Set your exact Unity version here
-  PROJECT_PATH: . # <<< IMPORTANT: Path to your Unity project root (e.g., ".")
-  PACKAGE_NAME: MyPlugin.unitypackage # <<< IMPORTANT: Must match the packageName in your C# script
-  EXPORT_METHOD: ExportPackage.ExportMyPluginPackage # <<< IMPORTANT: Must match the method name in your C# script
+  UNITY_VERSION: 6000.0.47f1
+  PROJECT_PATH: .
+  PACKAGE_NAME: Buttr.unitypackage
+  EXPORT_METHOD: PackageExporter.CreatePackage
 
 jobs:
   test:
-    name: Run Unity Tests
+    name: Run Tests
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout Code
         uses: actions/checkout@v4
         with:
           lfs: true
 
-      - name: Cache Unity Library
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.PROJECT_PATH }}/Library
-          # FIX: Corrected path construction for hashFiles
-          key: Unity-Library-${{ env.UNITY_VERSION }}-${{ hashFiles(env.PROJECT_PATH, '/**') }}
-          restore-keys: |
-            Unity-Library-${{ env.UNITY_VERSION }}-
-
       - name: Set up Unity
-        uses: game-ci/unity-Setup@v4
+        uses: game-ci/unity-setup@v4
         with:
-          unity-version: ${{ env.UNITY_VERSION }}
-          unity-license: ${{ secrets.UNITY_LICENSE }} # Use your GitHub Secret
+          unityVersion: ${{ env.UNITY_VERSION }}
+          unityLicense: ${{ secrets.UNITY_LICENSE }}
 
-      - name: Run Unity Tests
+      - name: Run PlayMode Tests
         uses: game-ci/unity-test-runner@v2
         with:
           projectPath: ${{ env.PROJECT_PATH }}
-          unityVersion: ${{ env.UNITY_VERSION }}
           testMode: playmode
-          artifactsPath: ${{ github.workspace }}/artifacts/tests
 
-      - name: Upload Test Results Artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-results
-          path: ${{ github.workspace }}/artifacts/tests
-          retention-days: 7
-
-  export_package:
-    name: Export Unity Package
+  export:
+    name: Export Package
     runs-on: ubuntu-latest
     needs: test
     steps:
-      - name: Checkout repository
+      - name: Checkout Code
         uses: actions/checkout@v4
         with:
           lfs: true
 
-      - name: Cache Unity Library
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.PROJECT_PATH }}/Library
-          # FIX: Corrected path construction for hashFiles
-          key: Unity-Library-${{ env.UNITY_VERSION }}-${{ hashFiles(env.PROJECT_PATH, '/**') }}
-          restore-keys: |
-            Unity-Library-${{ env.UNITY_VERSION }}-
-
       - name: Set up Unity
-        uses: game-ci/unity-Setup@v4
+        uses: game-ci/unity-setup@v4
         with:
-          unity-version: ${{ env.UNITY_VERSION }}
-          unity-license: ${{ secrets.UNITY_LICENSE }}
+          unityVersion: ${{ env.UNITY_VERSION }}
+          unityLicense: ${{ secrets.UNITY_LICENSE }}
 
-      - name: Run Unity Package Export Script
+      - name: Export Unity Package
         uses: game-ci/unity-builder@v2
         with:
           projectPath: ${{ env.PROJECT_PATH }}
-          unityVersion: ${{ env.UNITY_VERSION }}
-          targetPlatform: StandaloneWindows64
           buildMethod: ${{ env.EXPORT_METHOD }}
-          buildPath: TempBuild
+          targetPlatform: StandaloneWindows64 # Required but not actually used for .unitypackage
 
-      - name: Upload Unity Package Artifact
+      - name: Upload Unity Package
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.PACKAGE_NAME }}
+          name: unity-package
           path: ${{ env.PROJECT_PATH }}/${{ env.PACKAGE_NAME }}
-          retention-days: 7
 
   release:
-    name: Create GitHub Release and Upload Package
+    name: Create Release
     runs-on: ubuntu-latest
-    needs: export_package
-    if: github.ref == 'refs/heads/main'
+    needs: export
     steps:
-      - name: Download Unity Package Artifact
+      - name: Download Unity Package
         uses: actions/download-artifact@v4
         with:
-          name: ${{ env.PACKAGE_NAME }}
-          path: ${{ github.workspace }}
-
-      - name: Get current date for release tag
-        id: date
-        run: echo "RELEASE_DATE=$(date +'%Y.%m.%d-%H%M')" >> "$GITHUB_OUTPUT"
+          name: unity-package
+          path: package
 
       - name: Create Release
         id: create_release
@@ -115,21 +78,21 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: package-v${{ steps.date.outputs.RELEASE_DATE }}
-          release_name: Package Release ${{ steps.date.outputs.RELEASE_DATE }}
+          tag_name: v${{ github.run_number }}
+          release_name: Unity Package v${{ github.run_number }}
           body: |
-            Automated Unity package export from commit ${{ github.sha }}
+            Automatically exported Unity package.
+            Commit: ${{ github.sha }}
             Unity Version: ${{ env.UNITY_VERSION }}
-            Contains: (List the contents exported by your script, e.g., "MyPlugin assets and scripts")
           draft: false
           prerelease: false
 
-      - name: Upload Unity Package Asset to Release
+      - name: Upload .unitypackage to Release
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}/${{ env.PACKAGE_NAME }}
+          asset_path: package/${{ env.PACKAGE_NAME }}
           asset_name: ${{ env.PACKAGE_NAME }}
           asset_content_type: application/octet-stream
