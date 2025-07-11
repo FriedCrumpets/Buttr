@@ -10,15 +10,16 @@ re-usable configurable packages.
 - resolve dependencies anywhere using `new DIBuilder()`
 
 ## Installation
-You can install Buttr through the Unity Package Manager Or via Package through the Releases page;
+You can install Buttr through the Unity Package Manager Or via unity package through the Releases page;
 
 ### Unity Package Manager
-```
-insert link here
-```
+1. Open up Unity
+2. Click the lil' '+' at the top left
+3. 'Install package from git url'
+4. Paste `https://github.com/FriedCrumpets/Buttr.git?path=Assets/Plugins/Buttr`
 
 ### Releases
-> Insert Link here
+> [ReleaseLink](https://github.com/FriedCrumpets/Buttr/releases/tag/v1.0.0)
 
 ## Getting Started
 ### Application
