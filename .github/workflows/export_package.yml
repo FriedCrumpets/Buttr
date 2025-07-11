@@ -21,7 +21,7 @@ jobs:
           lfs: true
 
       - name: Set up Unity
-        uses: game-ci/unity-setup@v4
+        uses: game-ci/unity-setup@v3
         with:
           unityVersion: ${{ env.UNITY_VERSION }}
           unityLicense: ${{ secrets.UNITY_LICENSE }}
