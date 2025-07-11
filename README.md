@@ -1,4 +1,6 @@
-# BUTTR
+# BUTTR 
+> Built for Unity 6 onwards.
+
 Using Expression Trees at it's core and minimising reflection by using code generation for attribute injection. Buttr is
 designed to be lightning fast at resolving dependencies whenever you need them and is extendable to allow for users to add
 re-usable configurable packages.
