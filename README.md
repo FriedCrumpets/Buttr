@@ -1,4 +1,4 @@
-# BUTTR 
+# BUTTR - The Unity Dependency Injection Framework
 > Built for Unity 6 onwards.
 
 Using Expression Trees at it's core and minimising reflection by using code generation for attribute injection. Buttr is
