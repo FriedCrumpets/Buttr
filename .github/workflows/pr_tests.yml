@@ -29,7 +29,7 @@ jobs:
             Unity-Library-${{ env.UNITY_VERSION }}-
 
       - name: Set up Unity
-        uses: game-ci/unity-setup@v2
+        uses: game-ci/unity-setup@v4
         with:
           unity-version: ${{ env.UNITY_VERSION }}
           unity-license: ${{ secrets.UNITY_LICENSE }} # Use your GitHub Secret
