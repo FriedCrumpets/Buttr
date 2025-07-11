@@ -1,0 +1,20 @@
+{
+  "name": "com.crumpetlabs.buttr",
+  "version": "1.0.0",
+  "displayName": "Buttr",
+  "description": "A lightweight DI framework, built for Unity",
+  "unity": "2021.1",
+  "unityRelease": "0b5",
+  "documentationUrl": "https://example.com/",
+  "changelogUrl": "https://example.com/changelog.html",
+  "license": "MIT",
+  "category": "Dependency Injection",
+  "dependencies": { },
+  "keywords": [
+    "DI",
+    "Dependency Injection"
+  ],  "author": {
+    "name": "Crumpet Labs",
+    "url": "https://www.crumpetIndustries.com"
+  }
+}

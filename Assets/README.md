@@ -1,7 +1,7 @@
 # BUTTR
-Using Expression Trees at it's core and minimising reflection by using code generation for attribute injection. Buttr is
+Using Expression Trees at it's core and minimising reflection by using code generation for attribute injection. Buttr is 
 designed to be lightning fast at resolving dependencies whenever you need them and is extendable to allow for users to add
-re-usable configurable packages.
+re-usable configurable packages. 
 
 - `[Inject]` & `[InjectScope(key)]` Attributes allow for MonoBehaviour injection of application dependencies and scoped dependencies
 - Build Application wide dependencies using a ` new ApplicationBuilder()`
@@ -22,7 +22,7 @@ insert link here
 
 ## Getting Started
 ### Application
-ApplicationBuilders don't create a container object. They resolve to the static resolver registry and are accessed through
+ApplicationBuilders don't create a container object. They resolve to the static resolver registry and are accessed through 
 `Application<T>.Get();`. The static registry is used for all Dependency Injection containers throughout the application.
 It's recommended to use one `ApplicationBuilder` per Unity Application. Use this to create the your applications main framework.
 ```csharp
@@ -107,8 +107,8 @@ sameContainer.Get<IFoo>(); // will throw
 ### DIBuilder
 If you want to resolve objects anywhere in the project use a DIBuilder.
 `var builder = new DIBuilder();`. as you expect has similar functionality as a ScopeBuilder and ScopeContainer except
-nothing is registered to be statically accessible. Will resolve for dependencies registered with the container first and if
-they're not present it will look to the static application container for the rest.
+nothing is registered to be statically accessible. Will resolve for dependencies registered with the container first and if 
+they're not present it will look to the static application container for the rest. 
 
 ### Configurables
 When developing to add a full package of functionality to a container there is an object called `ConfigurableCollection`
@@ -135,8 +135,8 @@ Letting you port in packages from other developers or developing a package yours
 with a single line while providing the users with a way to configure said Package to suit their needs.
 
 ### MonoBehaviour Injection
-Originally this framework was built to not use MonoBehaviour injection. The idea was to get your dependencies manually
-in `Awake` using `Application.Get<T>()` however someone twisted my arm. The reason for this.
+Originally this framework was built to not use MonoBehaviour injection. The idea was to get your dependencies manually 
+in `Awake` using `Application.Get<T>()` however someone twisted my arm. The reason for this. 
 
 > I don't like runtime reflection
 
@@ -149,26 +149,26 @@ public partial class MyMonoBehaviour : MonoBehaviour {
 }
 ```
 And that's it. Buttr will generate the injection code and slap it in a folder in your project.
-By default this folder is `Assets/Buttr/Injection/` but you can modify the configuration file located in
+By default this folder is `Assets/Buttr/Injection/` but you can modify the configuration file located in 
 `Assets/Buttr` to change this at any time.
 
 The `InjectionConfiguration` Scriptable Object will be generated automatically the first time you use the `[Inject]` attribute.
-Once created this is the base of operations for managing your injected code.
+Once created this is the base of operations for managing your injected code. 
 
 Right click on the ScriptableObject in the inspector to either `Clear the object cache` or `reset to defaults`.
 You will want to clear the cache if you delete or modify a generated injection file.
 
 ### Unity Loaders
-Loaders provide a really clear and clean way to boot an application. They can be used for anything and are lightweight
+Loaders provide a really clear and clean way to boot an application. They can be used for anything and are lightweight 
 easy to configure.
 
 - Create a new Scene, name it boot, main, program, whatever floats your boat
 - Create a gameobject in that scene, again name it appropriately
 - Add a `UnityApplicationBoot` component to that gameObject.
-
+  
 The `UnityApplicationBoot` Provides a simple async/await way to load `Loaders`
 
-Loaders are custom scriptableObjects that are designed to work like blocks of loading logic.
+Loaders are custom scriptableObjects that are designed to work like blocks of loading logic. 
 ```csharp
 public sealed class ApplicationLoader : UnityApplicationLoaderBase { 
     private ApplicationLifetime m_Lifetime;
