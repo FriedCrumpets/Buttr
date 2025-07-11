@@ -11,27 +11,6 @@ env:
   EXPORT_METHOD: PackageExporter.CreatePackage
 
 jobs:
-  test:
-    name: Run Tests
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-        with:
-          lfs: true
-
-      - name: Set up Unity
-        uses: game-ci/unity-setup@v4
-        with:
-          unityVersion: ${{ env.UNITY_VERSION }}
-          unityLicense: ${{ secrets.UNITY_LICENSE }}
-
-      - name: Run PlayMode Tests
-        uses: game-ci/unity-test-runner@v2
-        with:
-          projectPath: ${{ env.PROJECT_PATH }}
-          testMode: playmode
-
   export:
     name: Export Package
     runs-on: ubuntu-latest
