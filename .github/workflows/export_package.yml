@@ -6,10 +6,10 @@ on:
       - main # Trigger on push to the main branch
 
 env:
-  UNITY_VERSION: 6000.0.47f1 # <<< IMPORTANT: Set your exact Unity version here
+  UNITY_VERSION: 2023.2.14f1 # <<< IMPORTANT: Set your exact Unity version here
   PROJECT_PATH: . # <<< IMPORTANT: Path to your Unity project root (e.g., ".")
-  PACKAGE_NAME: Buttr.unitypackage # <<< IMPORTANT: Must match the packageName in your C# script
-  EXPORT_METHOD: PackageExporter.CreatePackage # <<< IMPORTANT: Must match the method name in your C# script
+  PACKAGE_NAME: MyPlugin.unitypackage # <<< IMPORTANT: Must match the packageName in your C# script
+  EXPORT_METHOD: ExportPackage.ExportMyPluginPackage # <<< IMPORTANT: Must match the method name in your C# script
 
 jobs:
   test:
@@ -25,7 +25,8 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ env.PROJECT_PATH }}/Library
-          key: Unity-Library-${{ env.UNITY_VERSION }}-${{ hashFiles(format('{0}/**',{ env.PROJECT_PATH })) }}
+          # FIX: Corrected path construction for hashFiles
+          key: Unity-Library-${{ env.UNITY_VERSION }}-${{ hashFiles(env.PROJECT_PATH, '/**') }}
           restore-keys: |
             Unity-Library-${{ env.UNITY_VERSION }}-
 
@@ -33,7 +34,7 @@ jobs:
         uses: game-ci/unity-Setup@v4
         with:
           unity-version: ${{ env.UNITY_VERSION }}
-          unity-license: ${{ secrets.UNITY_LICENSE }}
+          unity-license: ${{ secrets.UNITY_LICENSE }} # Use your GitHub Secret
 
       - name: Run Unity Tests
         uses: game-ci/unity-test-runner@v2
@@ -54,7 +55,7 @@ jobs:
   export_package:
     name: Export Unity Package
     runs-on: ubuntu-latest
-    needs: test # This job will only run if the 'test' job passes
+    needs: test
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -65,7 +66,8 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ env.PROJECT_PATH }}/Library
-          key: Unity-Library-${{ env.UNITY_VERSION }}-${{ hashFiles(format('{0}/**',{ env.PROJECT_PATH })) }}
+          # FIX: Corrected path construction for hashFiles
+          key: Unity-Library-${{ env.UNITY_VERSION }}-${{ hashFiles(env.PROJECT_PATH, '/**') }}
           restore-keys: |
             Unity-Library-${{ env.UNITY_VERSION }}-
 
@@ -76,33 +78,32 @@ jobs:
           unity-license: ${{ secrets.UNITY_LICENSE }}
 
       - name: Run Unity Package Export Script
-        uses: game-ci/unity-builder@v2 # We use unity-builder action as it can run custom methods
+        uses: game-ci/unity-builder@v2
         with:
           projectPath: ${{ env.PROJECT_PATH }}
           unityVersion: ${{ env.UNITY_VERSION }}
-          targetPlatform: StandaloneWindows64 # Placeholder - required, but not used for package export
-          buildMethod: ${{ env.EXPORT_METHOD }} # This runs your C# method
-          # buildPath: does not apply for package export, but may be required by the action, so you can point it anywhere
-          buildPath: TempBuild # Placeholder path to satisfy the action if it requires it
+          targetPlatform: StandaloneWindows64
+          buildMethod: ${{ env.EXPORT_METHOD }}
+          buildPath: TempBuild
 
       - name: Upload Unity Package Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.PACKAGE_NAME }}
-          path: ${{ env.PROJECT_PATH }}/${{ env.PACKAGE_NAME }} # Path where your C# script saved the package
+          path: ${{ env.PROJECT_PATH }}/${{ env.PACKAGE_NAME }}
           retention-days: 7
 
   release:
     name: Create GitHub Release and Upload Package
     runs-on: ubuntu-latest
-    needs: export_package # This job will only run if the 'export_package' job passes
-    if: github.ref == 'refs/heads/main' # Only create release on main branch pushes
+    needs: export_package
+    if: github.ref == 'refs/heads/main'
     steps:
       - name: Download Unity Package Artifact
         uses: actions/download-artifact@v4
         with:
-          name: ${{ env.PACKAGE_NAME }} # Artifact name from the previous job
-          path: ${{ github.workspace }} # Download to the root of the runner's workspace
+          name: ${{ env.PACKAGE_NAME }}
+          path: ${{ github.workspace }}
 
       - name: Get current date for release tag
         id: date
@@ -114,7 +115,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: package-v${{ steps.date.outputs.RELEASE_DATE }} # Example tag: package-v2024.01.15-1030
+          tag_name: package-v${{ steps.date.outputs.RELEASE_DATE }}
           release_name: Package Release ${{ steps.date.outputs.RELEASE_DATE }}
           body: |
             Automated Unity package export from commit ${{ github.sha }}
@@ -129,6 +130,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}/${{ env.PACKAGE_NAME }} # Path to the downloaded package
+          asset_path: ${{ github.workspace }}/${{ env.PACKAGE_NAME }}
           asset_name: ${{ env.PACKAGE_NAME }}
-          asset_content_type: application/octet-stream # Standard MIME type for generic binary data
+          asset_content_type: application/octet-stream
