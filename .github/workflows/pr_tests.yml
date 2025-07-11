@@ -4,10 +4,10 @@ on:
   pull_request:
     branches:
       - main
-      - develop # Trigger on pull requests targeting main or develop
+      - develop
 
 env:
-  UNITY_VERSION: 6000.0.47f1 # <<< IMPORTANT: Set your exact Unity version here
+  UNITY_VERSION: 2023.2.14f1 # <<< IMPORTANT: Set your exact Unity version here
   PROJECT_PATH: . # <<< IMPORTANT: Path to your Unity project root (e.g., ".")
 
 jobs:
@@ -18,13 +18,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          lfs: true # Needed if you use Git LFS for large Unity assets
+          lfs: true
 
       - name: Cache Unity Library
         uses: actions/cache@v4
         with:
           path: ${{ env.PROJECT_PATH }}/Library
-          key: Unity-Library-${{ env.UNITY_VERSION }}-${{ hashFiles(format('{0}/**',{ env.PROJECT_PATH })) }}
+          # FIX: Corrected path construction for hashFiles
+          key: Unity-Library-${{ env.UNITY_VERSION }}-${{ hashFiles(env.PROJECT_PATH, '/**') }}
           restore-keys: |
             Unity-Library-${{ env.UNITY_VERSION }}-
 
@@ -32,22 +33,20 @@ jobs:
         uses: game-ci/unity-setup@v2
         with:
           unity-version: ${{ env.UNITY_VERSION }}
-          unity-license: ${{ secrets.UNITY_LICENSE }} # Use your GitHub Secret
+          unity-license: ${{ secrets.UNITY_LICENSE }}
 
       - name: Run Unity Tests
         uses: game-ci/unity-test-runner@v2
         with:
           projectPath: ${{ env.PROJECT_PATH }}
           unityVersion: ${{ env.UNITY_VERSION }}
-          testMode: all # Run both EditMode and PlayMode tests
+          testMode: all
           artifactsPath: ${{ github.workspace }}/artifacts/tests
-          # testResultsPath: ./artifacts/test-results.xml # Optional: Uncomment to save detailed XML
-          # coverageResultsPath: ./artifacts/coverage-results.xml # Optional: Uncomment to save coverage XML
 
       - name: Upload Test Results Artifacts
-        if: always() # Ensure this step runs even if tests fail, so results are always available
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: pr-test-results
           path: ${{ github.workspace }}/artifacts/tests
-          retention-days: 5 # Keep PR test results for a shorter period
+          retention-days: 5
