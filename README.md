@@ -1,18 +1,24 @@
 # BUTTR - The Unity Dependency Injection Framework
 > Built for Unity 6 onwards.
 
-Using Expression Trees at it's core and minimising reflection by using code generation for attribute injection. Buttr is
+Using Lazy Instantiation & Expression Trees at it's core and minimising reflection by using code generation for attribute injection. Buttr is
 designed to be lightning fast at resolving dependencies whenever you need them and is extendable to allow for users to add
-re-usable configurable packages.
+re-usable configurable packages. 
 
+It's simple and small in its design, and it has been built to fit into current `MonoSingleton` architectures with little required change;
+making it very easy to drop into projects without having to learn a large new toolset or massively change developers go to mindset. 
+
+> ⚠️ This has yet to be tested on IOS, Web GL, and consoles. I would advise some additional testing for choosing this framework for those platforms. 
+
+### Key Features
 - `[Inject]` & `[InjectScope(key)]` Attributes allow for MonoBehaviour injection of application dependencies and scoped dependencies
-- Build Application wide dependencies using a ` new ApplicationBuilder()`
-- Use `Application<T>.Get()` to access application wide dependencies anywhere
+- Build Application wide dependencies using a `new ApplicationBuilder()`
+- Use `Application<T>.Get()` to access application wide dependencies anywhere, resolving lazily
 - Build scope containers using a `new ScopeBuilder(string key)` and access them directly `ScopeRegistry.Get(key)`
 - resolve dependencies anywhere using `new DIBuilder()`
 
 ## Installation
-You can install Buttr through the Unity Package Manager Or via unity package through the Releases page;
+You can install Buttr through the Unity Package Manager or via unity package through the Releases page;
 
 ### Unity Package Manager
 1. Open up Unity
@@ -28,6 +34,8 @@ You can install Buttr through the Unity Package Manager Or via unity package thr
 ApplicationBuilders don't create a container object. They resolve to the static resolver registry and are accessed through
 `Application<T>.Get();`. The static registry is used for all Dependency Injection containers throughout the application.
 It's recommended to use one `ApplicationBuilder` per Unity Application. Use this to create the your applications main framework.
+
+Application objects can be injected into MonoBehaviours by using `[Inject]` attribute
 ```csharp
 // Create Application Wide containers using an Application Builder
 var builder = new ApplicationBuilder();
@@ -65,9 +73,14 @@ app.Dispose();
 var fooThrows = Application.Get<ITransientFoo>(); // This will throw a NullReferenceException
 ```
 
+
+
 ### Scope
 Scopes are created via a `new ScopeBuilder(string key);`. Upon building a scope it will register itself with the static
 scope registry to be injected into MonoBehaviours or accessed via `ScopeRegistry.Get(key);`
+
+Scoped objects can be injected into MonoBehaviours using the `[Inject(key)]` attribute
+
 ```csharp
 var builder = new ScopeBuilder("key");
 
@@ -113,6 +126,49 @@ If you want to resolve objects anywhere in the project use a DIBuilder.
 nothing is registered to be statically accessible. Will resolve for dependencies registered with the container first and if
 they're not present it will look to the static application container for the rest.
 
+### DIBuilder<TKey>
+There's a specific container that was built to solve strategy pattern resolution. This container breaks away from the norms of Dependency injection and allows for objects to be resolved through the use of a key. 
+The container does not enforce the same inheritance tree of objects as this can also be used for much broader styles of dynamic object resolution. 
+The idea was to capture Dependency injection, and build functional strategic resolution through the use of an identifier.
+
+It should be stated that unlike other `DIBuilder`s this `DIBuilder<T>()` will resolve it's dependencies through the static Application resolver registry, but it will not resolve dependencies from it's own container. 
+
+```csharp
+// below we define a DIBuilder with a key of string
+var builder = new DIBuilder<string>(); 
+
+// We add objects to resolve with a key. This builder cannot hold interface objects.
+builder.AddSingleton<Foo>("foo");
+builder.AddSingleton<Foo2>("foo2");
+
+// it's built in the normal way
+var container = builder.Build();
+
+// but objects are retrieved using their registered key. 
+var foo = container.Get("foo");
+var foo2 = container.Get("foo2");
+```
+
+While obscure this presents some interesting ways to allow for strategic behaviour resolution. For one what if we inject a container into a container.
+Then use that container to resolve strategies at runtime. All of the objects within that container would need to share a similar inheritance for this to function, although this is not enforced by the builder.
+```csharp
+var builder = new DIBuilder();
+builder.AddSingleton<IDIContainer<string>, DIContainer<string>>()
+    .WithFactory(() => {
+        var b = new DIBuilder<string>();
+        b.AddSingleton<Foo>("foo");
+        return b.Build();
+    });
+
+var container = builder.Build();
+
+var handle = Addressables.LoadAssetAsync<SomeScriptableObject>("foo");
+var container = container.Get<IDIContainer<string>>()
+await handle.Task;
+var obj = handle.Result;
+obj.Strategy = container.Get("foo");
+```
+
 ### Configurables
 When developing to add a full package of functionality to a container there is an object called `ConfigurableCollection`
 ```csharp
@@ -152,14 +208,19 @@ public partial class MyMonoBehaviour : MonoBehaviour {
 }
 ```
 And that's it. Buttr will generate the injection code and slap it in a folder in your project.
-By default this folder is `Assets/Buttr/Injection/` but you can modify the configuration file located in
-`Assets/Buttr` to change this at any time.
+By default this folder is created at `Assets/Buttr/Injection/` but you can modify the configuration file once it is generated; 
+located in `Assets/Buttr`. 
 
-The `InjectionConfiguration` Scriptable Object will be generated automatically the first time you use the `[Inject]` attribute.
-Once created this is the base of operations for managing your injected code.
+The `InjectionConfiguration` Scriptable Object will be generated automatically the first time you use the `[Inject]` attribute
+and your Unity Editor reloads. Once created this is the base of operations for managing your injected code.
 
 Right click on the ScriptableObject in the inspector to either `Clear the object cache` or `reset to defaults`.
 You will want to clear the cache if you delete or modify a generated injection file.
+
+To inject into objects at runtime you will need to use a `SceneInjector` MonoBehaviour or a `MonoInjector` MonoBehaviour.
+
+A `SceneInjector` will resolve all `[Inject]` dependencies of the scene it is placed in before Awake is called on other behaviours.
+A `MonoInjector` will resolve all `[Inject]` dependencies of a GameObject it is placed on before Awake is called on other behaviours. 
 
 ### Unity Loaders
 Loaders provide a really clear and clean way to boot an application. They can be used for anything and are lightweight
