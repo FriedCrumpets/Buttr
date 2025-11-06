@@ -12,7 +12,7 @@ namespace Buttr.Core {
         private GameObject m_GameObjectAndChildrenInjectObj;
         
         public override async Awaitable LoadAsync(CancellationToken cancellationToken) {
-            await SceneManager.LoadSceneAsync("MonoInjectTesting");
+            await SceneManager.LoadSceneAsync("MonoInjectTesting", LoadSceneMode.Additive);
             await Awaitable.WaitForSecondsAsync(.5f, cancellationToken);
             
             var monoInject = Resources.Load<TestInject>("TestMonoInject");

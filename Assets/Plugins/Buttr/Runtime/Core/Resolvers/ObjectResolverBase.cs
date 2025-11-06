@@ -28,7 +28,7 @@ namespace Buttr.Core {
                 requirements[i] = paramInfos[i].ParameterType;
             }
 
-            factory = ObjectFactory.Create<TConcrete>(selectedConstructor, paramInfos);
+            factory = ObjectFactory.Create<TConcrete>(selectedConstructor, requirements);
         }
 
         public abstract bool IsResolved { get; }

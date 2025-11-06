@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using UnityEngine;
+using Examples;
 
 namespace Buttr.Core {
     public static class Program {
@@ -8,7 +8,9 @@ namespace Buttr.Core {
         private static ApplicationLifetime Main(IDictionary<string, string> args) {
             var builder = new ApplicationBuilder();
 
-            Debug.Log("Built");
+            builder.Resolvers.AddTransient<ITestService, TestService>();
+            builder.Resolvers.AddSingleton<ITestService2, TestService2>();
+            builder.Resolvers.AddSingleton<TestService3>();
             
             return builder.Build();
         }

@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using System;
 
 namespace Buttr.Editor.Injection {
@@ -7,3 +8,4 @@ namespace Buttr.Editor.Injection {
         public string hash;
     }
 }
+#endif

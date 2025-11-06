@@ -148,6 +148,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f81cff22e7e496993783bc229f5e874, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_DontDestroyOnLoad: 1
   m_ApplicationLoaders:
   - {fileID: 11400000, guid: b474e0cdaccd737498aee3f04d04ff18, type: 2}
   - {fileID: 11400000, guid: 6a5c36f56ee7dd045a5863e3716cf7a9, type: 2}
