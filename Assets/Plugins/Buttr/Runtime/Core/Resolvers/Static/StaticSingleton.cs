@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 namespace Buttr.Core {
     internal sealed class StaticSingleton<TConcrete> : ObjectResolverBase<TConcrete>, IDisposable{
@@ -23,7 +24,20 @@ namespace Buttr.Core {
 
             var dependencies = ArrayPool<object>.Get(requirements.Length);
             if(requirements.Length > 0 ) {
-                ApplicationRegistry.GetDependencies(requirements, dependencies);
+                
+                try {
+                    ApplicationRegistry.GetDependencies(requirements, dependencies);
+                }
+                catch (Exception e) {
+                    var array = ArrayPool<string>.Get(requirements.Length);
+                    for (var i = 0; i < requirements.Length; i++) {
+                        var requirement = requirements[i];
+                        array[i] = requirement.FullName;
+                    }
+                    
+                    throw new ObjectResolverException($"Potential cyclic dependency located: See dependencies: {JsonUtility.ToJson(array)}");
+                }
+                
                 if (dependencies.TryValidate(requirements) == false) {
                     throw new ObjectResolverException($"Unable to locate all dependencies for {typeof(TConcrete)})");
                 }
