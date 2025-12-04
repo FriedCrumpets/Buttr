@@ -35,7 +35,7 @@ namespace Buttr.Core {
                         array[i] = requirement.FullName;
                     }
                     
-                    throw new ObjectResolverException($"Potential cyclic dependency located: See dependencies: {JsonUtility.ToJson(array)}");
+                    throw new ObjectResolverException($"Potential cyclic dependency located in {typeof(TConcrete)}: See dependencies: {JsonUtility.ToJson(array)}");
                 }
                 
                 if (dependencies.TryValidate(requirements) == false) {
