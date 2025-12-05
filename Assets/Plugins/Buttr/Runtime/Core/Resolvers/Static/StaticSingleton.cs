@@ -30,6 +30,7 @@ namespace Buttr.Core {
                 }
                 catch (Exception e) {
                     var array = ArrayPool<string>.Get(requirements.Length);
+                    
                     for (var i = 0; i < requirements.Length; i++) {
                         var requirement = requirements[i];
                         array[i] = requirement.FullName;
