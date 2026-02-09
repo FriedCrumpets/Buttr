@@ -28,7 +28,7 @@ namespace Buttr.Core {
                 try {
                     ApplicationRegistry.GetDependencies(requirements, dependencies);
                 }
-                catch (Exception e) {
+                catch (Exception _) {
                     var array = ArrayPool<string>.Get(requirements.Length);
                     
                     for (var i = 0; i < requirements.Length; i++) {
