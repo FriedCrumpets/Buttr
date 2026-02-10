@@ -3,7 +3,7 @@ Using Expression Trees at it's core and minimising reflection by using code gene
 designed to be lightning fast at resolving dependencies whenever you need them and is extendable to allow for users to add
 re-usable configurable packages. 
 
-- `[Inject]` & `[InjectScope(key)]` Attributes allow for MonoBehaviour injection of application dependencies and scoped dependencies
+- `[Inject]` & `[Inject(key)]` Attributes allow for MonoBehaviour injection of application dependencies and scoped dependencies
 - Build Application wide dependencies using a ` new ApplicationBuilder()`
 - Use `Application<T>.Get()` to access application wide dependencies anywhere
 - Build scope containers using a `new ScopeBuilder(string key)` and access them directly `ScopeRegistry.Get(key)`
@@ -145,7 +145,7 @@ Which is why injection uses code generation and static injection, but it does co
 // when wanting to inject into a MonoBehaviour we need to make that MonoBehaviour partial
 public partial class MyMonoBehaviour : MonoBehaviour { 
     [Inject] private IFoo _Foo;
-    [InjectScope("scope")] private IFoo _scopeFoo; 
+    [Inject("scope")] private IFoo _scopeFoo; 
 }
 ```
 And that's it. Buttr will generate the injection code and slap it in a folder in your project.
