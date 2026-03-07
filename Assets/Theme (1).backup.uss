@@ -1,0 +1,122 @@
+:root {
+    --color-bg-main: rgb(56, 56, 56);
+    --color-bg-panel: rgb(62, 62, 62);
+    --color-bg-darker: rgb(46, 46, 46);
+    --color-bg-console: rgb(30, 30, 30);
+    --color-border: rgb(136, 136, 136);
+    --color-input-background: rgb(136, 136, 136);
+    --color-input-text: rgb(255, 255, 255);
+    --color-accent-gold: rgb(212, 168, 67);
+    --color-accent-copper: rgb(184, 115, 51);
+    --color-accent-success: rgb(76, 175, 80);
+    --color-text-heading: rgb(238, 238, 238);
+    --color-text-body: rgb(196, 196, 196);
+    --color-text-muted: rgb(136, 136, 136);
+    --spacing-standard: 12px;
+    --spacing-large: 20px;
+}
+
+.unity-radio-button {
+    color: rgb(238, 238, 238);
+}
+
+.unity-radio-button__checkmark-background {
+    background-color: transparent;
+    border-width: 1px;
+    border-color: var(--color-border);
+    align-content: center;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+.unity-radio-button__checkmark {
+    background-color: var(--color-accent-gold);
+    flex-grow: 0;
+    width: 19px;
+    height: 19px;
+    top: -0.1px;
+    left: -0.1px;
+    align-self: center;
+    justify-content: center;
+    align-items: center;
+    border-radius: 25px;
+}
+
+.unity-radio-button__selected {
+    color: var(--color-accent-gold);
+}
+
+.buttr-logo {
+    flex-grow: 0;
+    background-image: url("project://database/Assets/Plugins/Buttr/Editor/SetupWizard/Images/Logo-simple.svg?fileID=7388822144124034973&guid=4635133cb527a0f40ab117dd328f31c8&type=3#Logo-simple");
+    background-color: rgba(0, 0, 0, 0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-self: center;
+    width: 208px;
+    height: 60px;
+    align-content: center;
+    flex-direction: column;
+    -unity-background-scale-mode: stretch-to-fill;
+    color: rgb(0, 0, 0);
+    -unity-background-image-tint-color: rgb(255, 255, 255);
+}
+
+.buttr-logo-section {
+    flex-grow: 0;
+    width: 520px;
+    height: 100px;
+    justify-content: center;
+}
+
+.unity-text-field__input {
+    background-color: var(--color-input-background);
+    color: var(--color-input-text);
+}
+
+.unity-toggle {
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    color: rgb(238, 238, 238);
+    -unity-font-style: normal;
+    -unity-text-align: middle-left;
+}
+
+.unity-toggle__label {
+}
+
+.unity-toggle__input {
+    background-color: transparent;
+    border-width: 1px;
+    border-color: var(--color-border);
+    align-content: center;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    flex-grow: 1;
+    width: 25px;
+    height: 25px;
+    border-radius: 5px;
+}
+
+.unity-toggle__checkmark {
+    background-color: transparent;
+    background-image: none;
+    border-width: 0;
+    flex-grow: 0;
+    width: 19px;
+    height: 19px;
+    top: -0.1px;
+    left: -0.1px;
+    align-self: center;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+}
+
+.unity-toggle__checked .unity-toggle__checkmark {
+    background-color: var(--color-accent-gold);
+}

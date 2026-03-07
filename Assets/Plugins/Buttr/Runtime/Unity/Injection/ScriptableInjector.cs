@@ -14,9 +14,7 @@ namespace Buttr.Unity {
 
         public void Inject(ApplicationBuilder builder) {
             foreach (var obj in m_Objects) {
-                Inject__Internal
-                    (obj.GetType())
-                    (builder, obj);
+                Inject__Internal (obj.GetType()) (builder, obj);
             }
         }
 

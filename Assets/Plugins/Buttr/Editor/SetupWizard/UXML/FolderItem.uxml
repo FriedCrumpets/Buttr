@@ -1,0 +1,6 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="Folder" style="flex-grow: 1; flex-direction: row; align-items: center; justify-content: space-between; align-self: center; align-content: stretch; width: auto; -unity-text-align: middle-center;">
+        <ui:Label text="/Folder Name" double-click-selects-word="false" triple-click-selects-line="false" display-tooltip-when-elided="false" enable-rich-text="true" style="color: rgb(238, 238, 238); font-size: 12px;" />
+        <ui:Button text="🗑" enable-rich-text="true" double-click-selects-word="false" triple-click-selects-line="false" display-tooltip-when-elided="false" style="width: 25px; height: 25px; color: rgb(238, 238, 238); background-color: rgba(203, 104, 89, 0); border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px;" />
+    </ui:VisualElement>
+</ui:UXML>

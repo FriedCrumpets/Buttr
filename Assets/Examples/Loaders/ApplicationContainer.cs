@@ -4,7 +4,7 @@ using Examples;
 using UnityEngine;
 
 namespace Buttr.Core {
-    [CreateAssetMenu(fileName = "UnityContainer", menuName = "Buttr/Examples/Loaders/Container", order = 0)]
+    // [CreateAssetMenu(fileName = "UnityContainer", menuName = "Buttr/Examples/Loaders/Container", order = 0)]
     public sealed class ApplicationContainer : UnityApplicationLoaderBase {
         private ApplicationLifetime m_App;
 
