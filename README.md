@@ -1,203 +1,346 @@
-# BUTTR 
-> Built for Unity 6 onwards.
+<p align="center">
+  <img src="Assets/Docs/Images/buttr-wordmark.svg" alt="Buttr Logo" width="400"/>
+</p>
 
-Using Expression Trees at it's core and minimising reflection by using code generation for attribute injection. Buttr is
-designed to be lightning fast at resolving dependencies whenever you need them and is extendable to allow for users to add
-re-usable configurable packages.
+<p align="center">
+  <strong>A lightweight Dependency Injection framework built in pure C# — currently targeting Unity 6+</strong>
+</p>
 
-- `[Inject]` & `[InjectScope(key)]` Attributes allow for MonoBehaviour injection of application dependencies and scoped dependencies
-- Build Application wide dependencies using a ` new ApplicationBuilder()`
-- Use `Application<T>.Get()` to access application wide dependencies anywhere
-- Build scope containers using a `new ScopeBuilder(string key)` and access them directly `ScopeRegistry.Get(key)`
-- resolve dependencies anywhere using `new DIBuilder()`
+<p align="center">
+  <a href="https://github.com/FriedCrumpets/Buttr/releases"><img src="https://img.shields.io/github/v/release/FriedCrumpets/Buttr?style=flat-square" alt="Release"></a>
+  <a href="https://github.com/FriedCrumpets/Buttr/blob/main/LICENSE"><img src="https://img.shields.io/github/license/FriedCrumpets/Buttr?style=flat-square" alt="License"></a>
+  <a href="https://unity.com"><img src="https://img.shields.io/badge/Unity-6+-black?style=flat-square&logo=unity" alt="Unity 6+"></a>
+  <a href="https://learn.microsoft.com/en-us/dotnet/csharp/"><img src="https://img.shields.io/badge/C%23-9-blue?style=flat-square&logo=csharp" alt="C#"></a>
+</p>
+
+<p align="center">
+  <a href="#installation">Installation</a> •
+  <a href="#getting-started">Getting Started</a> •
+  <a href="#features">Features</a> •
+  <a href="#documentation">Documentation</a> •
+  <a href="#contributing">Contributing</a>
+</p>
+
+---
+
+Buttr uses lazy instantiation and expression trees at its core, minimising reflection through compile-time source generation for attribute injection. It's designed to be lightning fast at resolving dependencies and is extendable to allow for reusable, configurable packages.
+
+It's small by design, built to fit into existing `MonoSingleton` architectures with minimal changes — making it easy to adopt without learning a large toolset or changing how your team thinks about code.
+
+> [!WARNING]
+> Buttr has not yet been tested on WebGL, or consoles. Additional testing is recommended for those platforms.
+
+## Features
+
+- **Source Generation** — `[Inject]` and `[Inject("scope")]` attributes generate injection code at compile time. No runtime reflection.
+- **Roslyn Analyzers** — Catch common DI mistakes before you hit play. Missing registrations, incorrect attribute usage, and structural issues are flagged as compiler warnings and errors.
+- **Setup Wizard** — Install via UPM, open Unity, and the setup wizard scaffolds your project structure automatically.
+- **Editor Tooling** — Right-click context menus to scaffold features, core packages, and individual types with full naming conventions and constructor injection wired up.
+- **Application Containers** — Build application-wide dependencies with `ApplicationBuilder` and access them anywhere via `Application.Get<T>()`.
+- **Scoped Containers** — Create isolated dependency scopes with `ScopeBuilder` for feature-specific resolution.
+- **Configurable Packages** — Bundle reusable DI configurations with `ConfigurableCollection` for plug-and-play package development.
+- **Async Boot System** — `UnityApplicationBoot` and `UnityApplicationLoaderBase` provide a clean async/await loading pipeline.
 
 ## Installation
-You can install Buttr through the Unity Package Manager Or via unity package through the Releases page;
 
-### Unity Package Manager
-1. Open up Unity
-2. Click the lil' '+' at the top left
-3. 'Install package from git url'
-4. Paste `https://github.com/FriedCrumpets/Buttr.git?path=Assets/Plugins/Buttr`
+### Unity Package Manager (Recommended)
 
-### Releases
-> [ReleaseLink](https://github.com/FriedCrumpets/Buttr/releases/tag/v1.0.0)
+1. Open Unity
+2. Open the Package Manager (`Window > Package Manager`)
+3. Click the `+` button in the top left
+4. Select **Install package from git URL**
+5. Paste the following URL:
 
-## Getting Started
-### Application
-ApplicationBuilders don't create a container object. They resolve to the static resolver registry and are accessed through
-`Application<T>.Get();`. The static registry is used for all Dependency Injection containers throughout the application.
-It's recommended to use one `ApplicationBuilder` per Unity Application. Use this to create the your applications main framework.
-```csharp
-// Create Application Wide containers using an Application Builder
-var builder = new ApplicationBuilder();
-
-// Add objects to this container, either singleton or transient
-// Singletons only ever resolve to a single instance
-builder.Resolvers.AddSingleton<ISingletonFoo, SingletonFoo>(); // <Abstract, Concrete>
-builder.Resolvers.AddSingleton<SingletonBar>(); // <Concrete>
-
-// Transients resolve for a new instance each time they are injected or pulled from the container
-builder.Resolvers.AddTransient<ITransientFoo, TransientFoo>(); // <Abstract, Concrete>
-builder.Resolvers.AddTransient<TransientBar>(); // <Concrete>
-
-// you can also hide objects to be available for injection, but not through Application<T>.Get();
-builder.Hidden.AddSingleton<ISingletonHidden, SingletonHidden>();
-builder.Hidden.AddTransient<SingletonHiddenBar>();
-
-// Adding an object to the builder returns a IConfigurable<TConcrete>
-// you can override the factory or force a specific configuration into the object
-builder.Resolvers.AddTransient<TestConfigurable>()
-    .WithFactory(() => return new TestConfigurable())
-    .WithConfiguration((testConfigurable) => { testConfigurable.Foo = "Bar"; return testConfigurable; });
-
-// building the application container returns an IDisposable LifeTime object
-var app = builder.Build();
-
-// After building we can access our objects via Application<T>.Get();
-// Due to lazy instantiation objects will only be allocated when requested
-var foo = Application.Get<ITransientFoo>(); 
-var bar = Application.Get<SingletonBar>();
-
-// Dispose of the lifetime to remove all from the static resolver registry and clear the Application<T>'s
-// disposing also disposes of all resolved singletons, transients are not disposed
-app.Dispose();
-var fooThrows = Application.Get<ITransientFoo>(); // This will throw a NullReferenceException
+```
+https://github.com/FriedCrumpets/Buttr.git?path=Assets/Plugins/Buttr#main
 ```
 
-### Scope
-Scopes are created via a `new ScopeBuilder(string key);`. Upon building a scope it will register itself with the static
-scope registry to be injected into MonoBehaviours or accessed via `ScopeRegistry.Get(key);`
-```csharp
-var builder = new ScopeBuilder("key");
+### Releases
 
-// Add singletons and transients the same way as an application container
+Download the latest `.unitypackage` from the [Releases](https://github.com/FriedCrumpets/Buttr/releases) page.
+
+## Getting Started
+
+### Setup Wizard
+
+After installing Buttr, the setup wizard will appear automatically when you open Unity.
+
+<!-- Replace with actual screenshot -->
+<p align="center">
+  <img src="docs/images/setup-wizard.png" alt="Buttr Setup Wizard" width="450"/>
+</p>
+
+The wizard displays your project name, Unity version, and Buttr version. It offers two paths:
+
+- **Quick Setup** — Accepts all convention defaults. Scaffolds `_Project/`, creates the boot scene, generates `Program.cs`, `ProgramLoader`, and an assembly definition, and configures build settings. One click and you're ready to build.
+- **Skip Conventions** — Installs Buttr as a standalone DI framework with no folder structure or scaffolding. Use the container on its own and adopt conventions later if you choose.
+
+With Quick Setup, Buttr will scaffold the following structure in your `Assets` folder:
+
+```
+Assets/
+└── _Project/
+    ├── {ProjectName}.asmdef  # Assembly definition for the project
+    ├── Main.unity            # Boot scene (added to build settings at index 0)
+    ├── Program.cs            # Application composition entry point
+    ├── README.md             # Usage documentation
+    ├── Core/                 # Core packages used by features
+    ├── Features/             # Feature-specific packages
+    ├── Shared/               # Assets and scripts shared across Core and Features
+    └── Catalog/              # ScriptableObject data assets, organised by feature
+```
+
+You can re-run the wizard at any time from `Tools > Buttr > Setup Project`.
+
+### Editor Tooling
+
+Buttr provides right-click context menus in the Project window under `Right-Click > Buttr > Packages`.
+
+**New Feature** and **New Core Package** prompt for a name and scaffold the full package structure — package entry point, assembly definition, Components folder with a Model, Presenter, Mediator, and Service, Contracts folder with the service interface, MonoBehaviours folder with a View, and a Loader. All classes are correctly named, sealed, and wired with constructor injection.
+
+**Add to Package** lets you add individual types to an existing package, grouped by architectural layer: Unity (Controller, View), Data (Model, Identifier, Definition, Configuration), Logic (Presenter, System, Mediator, Handler, Behaviour), Infrastructure (Service + Contract, Repository, Registry, Loader), and Structure (Extensions). Types that have dependencies — like Registry which requires an Identifier and Controller — scaffold those dependencies automatically.
+
+### Boot Scene
+
+The generated `Main.unity` scene contains a single `Boot` GameObject with the `UnityApplicationBoot` component. This is your application's entry point.
+
+`UnityApplicationBoot` loads `UnityApplicationLoaderBase` ScriptableObjects in sequence, providing a clean async/await pipeline for bootstrapping your application.
+
+`Program.cs` separates your application composition from Unity's boot lifecycle. Buttr also provides `CMDArgs`, a static utility that parses command line arguments before anything else runs, making launch arguments available for build configurations, server flags, and debug modes.
+
+```csharp
+public static class Program {
+    public static ApplicationLifetime Main() => Main(CMDArgs.Read());
+
+    private static ApplicationLifetime Main(IDictionary<string, string> args) {
+        var builder = new ApplicationBuilder();
+
+        builder.UseConsole();
+        builder.UseAudio();
+        builder.UseNetworking();
+
+        return builder.Build();
+    }
+}
+```
+
+The wizard also generates a `ProgramLoader` — a thin `UnityApplicationLoaderBase` that calls `Program.Main()` and manages the lifetime:
+
+```csharp
+[CreateAssetMenu(fileName = "ProgramLoader", menuName = "Buttr/Loaders/Program", order = 0)]
+public sealed class ProgramLoader : UnityApplicationLoaderBase {
+    private ApplicationLifetime m_Lifetime;
+
+    public override Awaitable LoadAsync(CancellationToken cancellationToken) {
+        m_Lifetime = Program.Main();
+        return AwaitableUtility.CompletedTask;
+    }
+
+    public override Awaitable UnloadAsync() {
+        m_Lifetime?.Dispose();
+        return AwaitableUtility.CompletedTask;
+    }
+}
+```
+
+All composition lives in `Program.cs`. The Loader is just the bridge to Unity's lifecycle. Both are generated by the setup wizard.
+
+### Application Container
+
+The `ApplicationBuilder` registers dependencies to a static resolver registry, accessible anywhere via `Application.Get<T>()`. Dependencies are lazily instantiated — they're only allocated when first requested.
+
+> **In practice, you should rarely call `Application.Get<T>()` directly.** It exists primarily for the source generator and as a migration path for developers moving away from MonoSingleton patterns. In normal usage, dependencies should be resolved through `[Inject]` on MonoBehaviours or constructor injection on plain C# classes.
+
+```csharp
+var builder = new ApplicationBuilder();
+
+// Singletons resolve to a single instance
+builder.Resolvers.AddSingleton<ISingletonFoo, SingletonFoo>();
+builder.Resolvers.AddSingleton<SingletonBar>();
+
+// Transients resolve to a new instance each time
+builder.Resolvers.AddTransient<ITransientFoo, TransientFoo>();
+builder.Resolvers.AddTransient<TransientBar>();
+
+// Hidden objects are available for constructor injection but not via Application.Get<T>()
+builder.Hidden.AddSingleton<ISingletonHidden, SingletonHidden>();
+
+// Configure factories and post-build configuration
+builder.Resolvers.AddTransient<TestConfigurable>()
+    .WithFactory(() => new TestConfigurable())
+    .WithConfiguration(obj => { obj.Foo = "Bar"; return obj; });
+
+// Build returns a disposable lifetime
+var app = builder.Build();
+
+// Access dependencies anywhere
+var foo = Application.Get<ITransientFoo>();
+var bar = Application.Get<SingletonBar>();
+
+// Dispose cleans up all resolved IDisposables
+app.Dispose();
+```
+
+All Buttr containers — application, scope, and standalone — automatically dispose any registered type that implements `IDisposable` when the container itself is disposed. The pattern is: a Loader builds the container, stores the returned lifetime or container reference, and disposes it in `UnloadAsync`. This ensures Mediators, Services, and any other type with cleanup logic are handled without manual disposal.
+
+### Scoped Containers
+
+Scopes provide isolated dependency containers, useful for feature-specific dependencies that shouldn't live at the application level.
+
+Define scope keys as constants to avoid magic strings and enable refactoring across the project:
+
+```csharp
+public static class Scopes {
+    public const string Inventory = "inventory";
+    public const string Gameplay = "gameplay";
+}
+```
+
+```csharp
+var builder = new ScopeBuilder(Scopes.Inventory);
+
 builder.AddTransient<IFoo, Foo>();
 builder.AddSingleton<Bar>();
 
-// If you want an object to be available for constructor injection 
-// but not gettable from the container it must inherit from IHidden
-sealed class HiddenTransient : IHidden { } 
-builder.AddTransient<HiddenTransient>();
-
-// Adding an object to the builder returns a IConfigurable<TConcrete>
-// you can override the factory or force a specific configuration into the object
-builder.AddTransient<TestConfigurable>()
-    .WithFactory(() => return new TestConfigurable())
-    .WithConfiguration((testConfigurable) => { testConfigurable.Foo = "Bar"; return testConfigurable; });
-
-// building registers the container with ScopeRegistry
-// building first checks the container for dependencies and then checks the application wide dependencies
-// meaning you can overwrite application behaviours for scopes if necessary
+// Building registers the container with ScopeRegistry
+// Scopes check their own container first, then fall back to the application container
 var container = builder.Build();
 
-// Get objects directly from the container
+// Access directly
 var foo = container.Get<IFoo>();
 
-// trying to get a hidden object will throow
-var hidden = container.Get<HiddenTransient>(); // throws ObjectResolverException
+// Or from anywhere via the registry
+var sameContainer = ScopeRegistry.Get(Scopes.Inventory);
 
-// you can get the scope container elsewhere via
-var sameContainer = ScopeRegistry.Get("key");
-
-// disposing of the container gets rid of the container in the scopeRegistry and disposes
+// Dispose removes from registry and disposes resolved singletons
 container.Dispose();
-
-// this will dispose of the container for all users of the container
-sameContainer.Get<IFoo>(); // will throw
 ```
-
-### DIBuilder
-If you want to resolve objects anywhere in the project use a DIBuilder.
-`var builder = new DIBuilder();`. as you expect has similar functionality as a ScopeBuilder and ScopeContainer except
-nothing is registered to be statically accessible. Will resolve for dependencies registered with the container first and if
-they're not present it will look to the static application container for the rest.
-
-### Configurables
-When developing to add a full package of functionality to a container there is an object called `ConfigurableCollection`
-```csharp
-public static IConfigurableCollection UseMyPackage(this ApplicationBuilder builder) { 
-    return new ConfigurableCollection()
-        .Register(builder.Resolvers.AddSingleton<MyFoo>())
-        .Register(builder.Resolvers.AddSingleton<IMyBar, MyBar>())
-}
-
-var builder = new ApplicationBuilder();
-builder.UseMyPackage()
-    .WithFactory<MyFoo>(() => return new MyFoo())
-    .WithConfiguration<MyBar>((bar) => { bar.SomeProperty = "bar"; return bar; }
-   
-builder.Build();
-```
-ConfigurableCollections can be used with all builders
-- ApplicationBuilder
-- ScopeBuilder
-- DIBuilder
-
-Letting you port in packages from other developers or developing a package yourself. The idea is to simplify adding packages
-with a single line while providing the users with a way to configure said Package to suit their needs.
 
 ### MonoBehaviour Injection
-Originally this framework was built to not use MonoBehaviour injection. The idea was to get your dependencies manually
-in `Awake` using `Application.Get<T>()` however someone twisted my arm. The reason for this.
 
-> I don't like runtime reflection
+Buttr generates injection code at compile time — no runtime reflection. MonoBehaviours using injection must be `partial`.
 
-Which is why injection uses code generation and static injection, but it does come with a caveat.
 ```csharp
-// when wanting to inject into a MonoBehaviour we need to make that MonoBehaviour partial
-public partial class MyMonoBehaviour : MonoBehaviour { 
-    [Inject] private IFoo _Foo;
-    [InjectScope("scope")] private IFoo _scopeFoo; 
+public partial class PlayerController : MonoBehaviour {
+    [Inject] private IInputService _inputService;
+    [Inject(Scopes.Gameplay)] private ICombatSystem _combatSystem;
 }
 ```
-And that's it. Buttr will generate the injection code and slap it in a folder in your project.
-By default this folder is `Assets/Buttr/Injection/` but you can modify the configuration file located in
-`Assets/Buttr` to change this at any time.
 
-The `InjectionConfiguration` Scriptable Object will be generated automatically the first time you use the `[Inject]` attribute.
-Once created this is the base of operations for managing your injected code.
+To inject at runtime, use one of the provided injector components:
 
-Right click on the ScriptableObject in the inspector to either `Clear the object cache` or `reset to defaults`.
-You will want to clear the cache if you delete or modify a generated injection file.
+- **`SceneInjector`** — Resolves all `[Inject]` dependencies for every MonoBehaviour in the scene before `Awake` is called.
+- **`MonoInjector`** — Resolves all `[Inject]` dependencies for MonoBehaviours on a specific GameObject before `Awake` is called.
 
-### Unity Loaders
-Loaders provide a really clear and clean way to boot an application. They can be used for anything and are lightweight
-easy to configure.
+### Source Generation
 
-- Create a new Scene, name it boot, main, program, whatever floats your boat
-- Create a gameobject in that scene, again name it appropriately
-- Add a `UnityApplicationBoot` component to that gameObject.
+**Buttr's source generators run at compile time to produce the injection code for any MonoBehaviour using `[Inject]` or `[Inject("Scope")]`. This means there is zero runtime reflection overhead** — all injection is handled through generated static methods.
 
-The `UnityApplicationBoot` Provides a simple async/await way to load `Loaders`
+Source generation is always active and cannot be disabled. It is a core part of how Buttr operates.
 
-Loaders are custom scriptableObjects that are designed to work like blocks of loading logic.
+### Roslyn Analyzers
+
+Buttr includes Roslyn analyzers that catch common mistakes at compile time. These provide warnings and errors directly in your IDE and Unity console for issues such as:
+
+- Using `[Inject]` on a non-partial MonoBehaviour
+- Missing dependency registrations
+- Incorrect attribute usage
+- Structural issues in your DI setup
+
+Analyzers are bundled with the package and are always active.
+
+### DIBuilder
+
+For ad-hoc dependency resolution that doesn't need to be globally or scope-accessible:
+
 ```csharp
-public sealed class ApplicationLoader : UnityApplicationLoaderBase { 
-    private ApplicationLifetime m_Lifetime;
-    
-    public override Awaitable LoadAsync(CancellationToken cancellationToken) { 
-        // cancellationToken is the UnityApplicationBoot gameObject lifetime cancellationToken
-        var builder = new ApplicationBuilder();
-        
-        // add resolvers
-        
-        m_LifeTime = builder.Build();
-        
-        // because we haven't awaited anything here we can return with 
-        return AwaitableUtility.CompletedTask;
-    }
-    
-    public override Awaitable UnloadAsync() {
-        m_LifeTime?.Dispose();    
-        return AwaitableUtility.CompletedTask;
-    }
-}
+var builder = new DIBuilder();
+builder.AddSingleton<IFoo, Foo>();
+builder.AddTransient<Bar>();
+
+var container = builder.Build();
+var foo = container.Get<IFoo>();
 ```
-In this example we haven't really utilised Awaitable, but you may come across circumstances where this is essential.
-- Pre-warming assets
-- Loading scenes
-- Web API calls
 
+`DIBuilder` resolves from its own container first, then falls back to the application container.
 
+### DIBuilder&lt;TKey&gt;
 
+A specialised container for strategy pattern resolution. Objects are registered and retrieved by key.
+
+```csharp
+var builder = new DIBuilder<string>();
+
+builder.AddSingleton<Foo>("foo");
+builder.AddSingleton<Bar>("bar");
+
+var container = builder.Build();
+
+var foo = container.Get("foo");
+var bar = container.Get("bar");
+```
+
+This enables dynamic strategy resolution at runtime — useful for scenarios like loading behaviour from data-driven configurations.
+
+### Configurable Packages
+
+Bundle reusable DI registrations into packages using `ConfigurableCollection`:
+
+```csharp
+public static IConfigurableCollection UseNetworking(this ApplicationBuilder builder) {
+    return new ConfigurableCollection()
+        .Register(builder.Resolvers.AddSingleton<INetworkClient, NetworkClient>())
+        .Register(builder.Resolvers.AddSingleton<ISessionManager, SessionManager>());
+}
+
+// Usage
+var builder = new ApplicationBuilder();
+builder.UseNetworking()
+    .WithConfiguration<NetworkClient>(client => {
+        client.Endpoint = "https://api.example.com";
+        return client;
+    });
+
+builder.Build();
+```
+
+Configurable collections work with `ApplicationBuilder`, `ScopeBuilder`, and `DIBuilder`.
+
+## Project Structure
+
+Buttr enforces a feature-based project structure rather than the traditional Unity folder organisation (Scripts, Scenes, Prefabs, etc.).
+
+| Folder | Purpose |
+|--------|---------|
+| `Core/` | Game-agnostic packages reusable across projects |
+| `Features/` | Game-specific feature packages |
+| `Shared/` | Assets and scripts used by both Core and Features |
+| `Catalog/` | ScriptableObject data assets, organised by feature |
+
+For a detailed guide on naming conventions, folder structure, and the architectural patterns recommended by Buttr, see the [Architecture Guide](Docs/PROJECT_README.md).
+
+## Requirements
+
+- Unity 6 or later
+- .NET Standard 2.1 / .NET 6+
+
+## Roadmap
+
+- [ ] WebGL and console platform testing
+- [ ] Additional Roslyn analyzer rules
+- [ ] Scope Visualiser editor window
+- [ ] Dependency graph editor window
+
+## Documentation
+
+- **[Architecture Guide](Docs/PROJECT_README.md)** — Naming conventions, folder structure, design philosophy, and the architectural patterns recommended by Buttr.
+
+Additional documentation including API reference and tutorials is planned.
+
+## Contributing
+
+Contributions are welcome. Please open an issue first to discuss what you'd like to change.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).

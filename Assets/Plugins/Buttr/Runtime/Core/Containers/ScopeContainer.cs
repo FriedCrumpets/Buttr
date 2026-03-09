@@ -4,29 +4,31 @@ using System.Collections.Generic;
 namespace Buttr.Core {
     internal sealed class ScopeContainer : IDIContainer {
         private readonly Dictionary<Type, IObjectResolver> m_Registry;
+        private readonly HashSet<Type> m_HiddenTypes;
 
         private IDisposable m_Registration;
-        
-        internal ScopeContainer(Dictionary<Type, IObjectResolver> registry) {
+
+        internal ScopeContainer(Dictionary<Type, IObjectResolver> registry, HashSet<Type> hiddenTypes) {
             m_Registry = registry;
+            m_HiddenTypes = hiddenTypes;
         }
-        
+
         internal IDisposable ScopeRegistration {
             set { m_Registration = value; }
         }
 
         public T Get<T>() {
-            if (typeof(IHidden).IsAssignableFrom(typeof(T))) 
+            if (m_HiddenTypes.Contains(typeof(T)))
                 throw new ObjectResolverException("Attempting to retrieve a Hidden object from a ScopeContainer");
-            
+
             if (m_Registry.TryGetValue(typeof(T), out var resolver))
                 return (T)resolver.Resolve();
 
             return default;
         }
-        
+
         public bool TryGet<T>(out T value) {
-            if (typeof(IHidden).IsAssignableFrom(typeof(T))) 
+            if (m_HiddenTypes.Contains(typeof(T)))
                 throw new ObjectResolverException("Attempting to retrieve a Hidden object from a ScopeContainer");
 
             var found = m_Registry.TryGetValue(typeof(T), out var resolver);

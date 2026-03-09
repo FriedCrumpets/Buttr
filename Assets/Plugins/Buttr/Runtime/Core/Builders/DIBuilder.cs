@@ -16,11 +16,11 @@ namespace Buttr.Core {
         private readonly Dictionary<TID, IObjectResolver> m_Registry = new();
         private readonly List<IResolver> m_Resolvers = new();
         public Type Type => typeof(TID);
-        
+
         public IConfigurable<TConcrete> AddTransient<TConcrete>(TID id) {
             if (typeof(TConcrete).IsInterface)
                 throw new ArgumentException($"{typeof(TConcrete)} cannot be an interface", nameof(TConcrete));
-            
+
             var resolver =  new IDTransientObjectResolver<TID, TConcrete>(id, m_Registry);
             m_Resolvers.Add(resolver);
             return resolver;
@@ -29,7 +29,7 @@ namespace Buttr.Core {
         public IConfigurable<TConcrete> AddSingleton<TConcrete>(TID id) {
             if (typeof(TConcrete).IsInterface)
                 throw new ArgumentException($"{typeof(TConcrete)} cannot be an interface", nameof(TConcrete));
-            
+
             var resolver =  new IDSingletonObjectResolver<TID, TConcrete>(id, m_Registry);
             m_Resolvers.Add(resolver);
             return resolver;
@@ -41,7 +41,7 @@ namespace Buttr.Core {
             return new DIContainer<TID>(m_Registry);
         }
     }
-    
+
     /// <summary>
     /// Used to construct a container for resolving objects
     /// </summary>
@@ -51,42 +51,46 @@ namespace Buttr.Core {
     /// </remarks>
     public class DIBuilder : IDIBuilder {
         private readonly Dictionary<Type, IObjectResolver> m_Registry = new();
-        private readonly List<IResolver> m_Resolvers = new();
+        private readonly HashSet<Type> m_HiddenTypes = new();
+
+        private readonly IResolverCollection m_Resolvers;
+        private readonly IResolverCollection m_Hidden;
+
+        public DIBuilder() {
+            m_Resolvers = new ObjectResolverCollection(m_Registry);
+            m_Hidden = new HiddenObjectResolverCollection(m_Registry, m_HiddenTypes);
+        }
+
+        public IResolverCollection Resolvers => m_Resolvers;
+        public IResolverCollection Hidden => m_Hidden;
 
         public IConfigurable<TConcrete> AddTransient<TConcrete>() {
             if (typeof(TConcrete).IsInterface)
                 throw new ArgumentException($"{typeof(TConcrete)} cannot be an interface when added this way", nameof(TConcrete));
-            
-            var resolver = new TransientObjectResolver<TConcrete>(m_Registry);
-            m_Resolvers.Add(resolver);
-            return resolver;
+
+            return m_Resolvers.AddTransient<TConcrete>();
         }
-        
+
         public IConfigurable<TConcrete> AddTransient<TAbstract, TConcrete>()  where TConcrete : TAbstract  {
-            var resolver = new TransientObjectResolver<TAbstract, TConcrete>(m_Registry);
-            m_Resolvers.Add(resolver);
-            return resolver;
+            return m_Resolvers.AddTransient<TAbstract, TConcrete>();
         }
-        
+
         public IConfigurable<TConcrete> AddSingleton<TConcrete>() {
             if (typeof(TConcrete).IsInterface)
                 throw new ArgumentException($"{typeof(TConcrete)} cannot be an interface when added this way", nameof(TConcrete));
-            
-            var resolver = new SingletonObjectResolver<TConcrete>(m_Registry);
-            m_Resolvers.Add(resolver);
-            return resolver;
+
+            return m_Resolvers.AddSingleton<TConcrete>();
         }
-        
+
         public IConfigurable<TConcrete> AddSingleton<TAbstract, TConcrete>()  where TConcrete : TAbstract {
-            var resolver = new SingletonObjectResolver<TAbstract, TConcrete>(m_Registry);
-            m_Resolvers.Add(resolver);
-            return resolver;
+            return m_Resolvers.AddSingleton<TAbstract, TConcrete>();
         }
 
         public IDIContainer Build() {
-            foreach (var resolver in m_Resolvers) resolver.Resolve();
+            m_Hidden.Resolve();
+            m_Resolvers.Resolve();
 
-            return new DIContainer(m_Registry);
+            return new DIContainer(m_Registry, m_HiddenTypes);
         }
     }
 }

@@ -19,20 +19,14 @@ namespace Buttr.Core {
         public Type Type => typeof(TID);
         
         public T Get<T>(TID id) {
-            if (typeof(IHidden).IsAssignableFrom(typeof(T))) 
-                throw new ObjectResolverException("Attempting to retrieve a Hidden object from a DIContainer");
-
             if (m_Registry.TryGetValue(id, out var resolver)) {
                 return (T)resolver.Resolve();
             }
 
             return default;
         }
-        
+
         public bool TryGet<T>(TID id, out T value) {
-            if (typeof(IHidden).IsAssignableFrom(typeof(T))) 
-                throw new ObjectResolverException("Attempting to retrieve a Hidden object from a DIContainer");
-            
             var found = m_Registry.TryGetValue(id, out var resolver);
             value = found ? (T)resolver.Resolve() : default;
             return found;
@@ -57,23 +51,25 @@ namespace Buttr.Core {
     /// </remarks>
     internal sealed class DIContainer : IDIContainer {
         private readonly Dictionary<Type, IObjectResolver> m_Registry;
+        private readonly HashSet<Type> m_HiddenTypes;
 
-        internal DIContainer(Dictionary<Type, IObjectResolver> registry) {
+        internal DIContainer(Dictionary<Type, IObjectResolver> registry, HashSet<Type> hiddenTypes) {
             m_Registry = registry;
+            m_HiddenTypes = hiddenTypes;
         }
 
         public T Get<T>() {
-            if (typeof(IHidden).IsAssignableFrom(typeof(T)))
+            if (m_HiddenTypes.Contains(typeof(T)))
                 throw new ObjectResolverException("Attempting to retrieve a Hidden object from a DIContainer");
-            
+
             if (m_Registry.TryGetValue(typeof(T), out var resolver))
                 return (T)resolver.Resolve();
 
             return default;
         }
-        
+
         public bool TryGet<T>(out T value) {
-            if (typeof(IHidden).IsAssignableFrom(typeof(T))) 
+            if (m_HiddenTypes.Contains(typeof(T)))
                 throw new ObjectResolverException("Attempting to retrieve a Hidden object from a DIContainer");
 
             var found = m_Registry.TryGetValue(typeof(T), out var resolver);

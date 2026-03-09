@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace Buttr.Core {
-    [CreateAssetMenu(fileName = "SceneInjectTesting", menuName = "Buttr/Examples/Loaders/SceneTesting", order = 0)]
+    // [CreateAssetMenu(fileName = "SceneInjectTesting", menuName = "Buttr/Examples/Loaders/SceneTesting", order = 0)]
     public sealed class SceneInjectTestLoader : UnityApplicationLoaderBase {
         private const string Scene_1 = "SceneInjectTestScene 1";
         private const string Scene_2 = "SceneInjectTestScene 2";

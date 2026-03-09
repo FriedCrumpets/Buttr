@@ -4,9 +4,10 @@ using UnityEngine;
 
 namespace Buttr.Editor {
     public static class PackageExporter {
+        [MenuItem("Buttr/Export Unity Package")]
         public static void CreatePackage() {
             var projectContent = new[] {
-                "Assets/Plugins/Buttr", // <<< IMPORTANT: Change this to the path of your folder(s) to export
+                "Assets/Plugins/Buttr", 
             };
 
             var packageName = "Buttr.unitypackage"; // <<< IMPORTANT: Desired name for your package file

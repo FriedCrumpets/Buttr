@@ -6,7 +6,8 @@
         "UnityEditor.TestRunner",
         "Buttr.Core",
         "Buttr.Injection",
-        "Buttr.Unity"
+        "Buttr.Unity",
+        "Buttr.Editor"
     ],
     "includePlatforms": [
         "Editor"

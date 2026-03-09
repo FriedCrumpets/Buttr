@@ -5,14 +5,14 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace Buttr.Core {
-    [CreateAssetMenu(fileName = "MonoInjectTesting", menuName = "Buttr/Examples/Loaders/MonoTesting", order = 0)]
+    // [CreateAssetMenu(fileName = "MonoInjectTesting", menuName = "Buttr/Examples/Loaders/MonoTesting", order = 0)]
     public sealed class MonoInjectTestLoader : UnityApplicationLoaderBase {
         private GameObject m_MonoInjectObj;
         private GameObject m_GameObjectInjectObj;
         private GameObject m_GameObjectAndChildrenInjectObj;
         
         public override async Awaitable LoadAsync(CancellationToken cancellationToken) {
-            await SceneManager.LoadSceneAsync("MonoInjectTesting");
+            await SceneManager.LoadSceneAsync("MonoInjectTesting", LoadSceneMode.Additive);
             await Awaitable.WaitForSecondsAsync(.5f, cancellationToken);
             
             var monoInject = Resources.Load<TestInject>("TestMonoInject");

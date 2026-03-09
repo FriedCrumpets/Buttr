@@ -4,14 +4,15 @@ using Examples;
 using UnityEngine;
 
 namespace Buttr.Core {
-    [CreateAssetMenu(fileName = "UnityContainer", menuName = "Buttr/Examples/Loaders/Container", order = 0)]
+    // [CreateAssetMenu(fileName = "UnityContainer", menuName = "Buttr/Examples/Loaders/Container", order = 0)]
     public sealed class ApplicationContainer : UnityApplicationLoaderBase {
         private ApplicationLifetime m_App;
 
         public override Awaitable LoadAsync(CancellationToken cancellationToken) {
             var builder = new ApplicationBuilder();
-            builder.Resolvers.AddSingleton<ITestService, TestService>();
-            builder.Resolvers.AddSingleton<TestService>();
+            builder.Resolvers.AddTransient<ITestService, TestService>();
+            builder.Resolvers.AddSingleton<ITestService2, TestService2>();
+            builder.Resolvers.AddSingleton<TestService3>();
             
             m_App = builder.Build();
             return AwaitableUtility.CompletedTask;

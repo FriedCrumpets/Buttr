@@ -1,0 +1,19 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Plugins/Buttr/Editor/SetupWizard/USS/Theme.uss?fileID=7433441132597879392&amp;guid=a7ffc1c40f094767a5d2397787931f3d&amp;type=3#Theme" />
+    <ui:VisualElement name="Header" style="flex-grow: 0; width: 520px; height: 200px;">
+        <ui:VisualElement name="Logo__Section" style="flex-grow: 0; width: 520px; height: 100px;">
+            <ui:VisualElement name="Logo__Section--background" style="flex-grow: 0; position: absolute; width: 520px; height: 100px;" />
+            <ui:VisualElement name="Logo__Image" style="flex-grow: 1;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="Title__Section" style="flex-grow: 0; width: 520px; height: 100px; flex-direction: column;">
+            <ui:VisualElement name="Title__Section--background" style="flex-grow: 0; position: absolute; width: 520px; height: 100px; background-color: rgb(56, 56, 54); color: rgb(55, 55, 55);" />
+            <ui:VisualElement name="Title__Section--additional" style="flex-grow: 1;" />
+            <ui:Label text="Choose your setup" name="Title__Section--header" enable-rich-text="false" emoji-fallback-support="false" double-click-selects-word="false" display-tooltip-when-elided="false" triple-click-selects-line="false" style="-unity-text-align: middle-center; color: rgb(254, 254, 254); -unity-font-definition: url(&quot;project://database/Library/unity%20default%20resources?fileID=10102&amp;guid=0000000000000000e000000000000000&amp;type=0#LegacyRuntime&quot;); font-size: 24px; -unity-font-style: bold; width: 520px; height: 50px; flex-direction: column-reverse;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+    <ui:VisualElement name="Body" style="flex-grow: 1;" />
+    <ui:VisualElement name="Footer" style="flex-grow: 0; width: 520px; height: 80px; background-color: rgb(55, 55, 55); white-space: normal; flex-direction: row; align-items: center; justify-content: space-between; align-self: flex-start;">
+        <ui:Button text="Button" name="Footer__LeftButton" />
+        <ui:Button text="Button" name="Footer__RightButton" />
+    </ui:VisualElement>
+</ui:UXML>

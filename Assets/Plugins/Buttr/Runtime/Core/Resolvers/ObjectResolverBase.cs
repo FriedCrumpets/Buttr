@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+using UnityEngine;
 
 namespace Buttr.Core {
     public abstract class ObjectResolverBase<TConcrete> : IObjectResolver {
@@ -25,10 +26,17 @@ namespace Buttr.Core {
             requirements = paramCount == 0 ? Array.Empty<Type>() : new Type[paramCount];
 
             for (var i = 0; i < paramCount; i++) {
-                requirements[i] = paramInfos[i].ParameterType;
+                
+                var paramType = paramInfos[i].ParameterType;
+                if (paramType.IsByRef) {
+                    paramType = paramType.GetElementType(); // unwrap ref type
+                    Debug.Log($"Type is passed by reference: reference passing does not function in Buttr {paramType}");
+                }
+
+                requirements[i] = paramType;
             }
 
-            factory = ObjectFactory.Create<TConcrete>(selectedConstructor, paramInfos);
+            factory = ObjectFactory.Create<TConcrete>(selectedConstructor, requirements);
         }
 
         public abstract bool IsResolved { get; }
