@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 namespace Buttr.Editor.SetupWizard {
     internal sealed class ButtrWizardViewMediator : IDisposable {
@@ -13,7 +14,7 @@ namespace Buttr.Editor.SetupWizard {
             m_View = view;
             m_Presenter = presenter;
             
-            view.Window1.OnSetupModeChanged += OnSetupModeSelected;
+            view.Window.OnSetupModeChanged += OnSetupModeSelected;
             
             view.Footer.OnLeftButtonClicked += OnLeftFooterButtonClicked;
             view.Footer.OnRightButtonClicked += OnRightFooterButtonClicked;
@@ -26,31 +27,39 @@ namespace Buttr.Editor.SetupWizard {
         }
         
         private void OnLeftFooterButtonClicked() {
-            if (m_Model.PageModel.CurrentPage == WizardPage.Selection) {
-                CloseRequested?.Invoke();
-                return;
-            }
-
-            m_Presenter.NavigateBack();
+            CloseRequested?.Invoke();
         }
         
         private void OnRightFooterButtonClicked() {
-            var closeRequested =
-                m_Model.InstallationModel.InstallComplete
-                || m_Model.PageModel.CurrentPage == WizardPage.Selection
-                && m_Model.SetupModel.SetupMode == SetupMode.SkipConventions;
-            
-            if (closeRequested) {
-                CloseRequested?.Invoke();
-                return;
+            if (m_Model.SetupModel.SetupMode == SetupMode.QuickSetup) {
+                try {
+                    Debug.Log("Starting Buttr Scaffolding...");
+                    new ButtrProjectScaffolder(
+                        m_Model.ProjectModel.ProjectName,
+                        m_Model.ProjectModel.ButtrVersion
+                    ).ExecuteQuickSetup();
+                } catch (Exception) {
+                    Debug.Log("Buttr Installation Interrupted");
+                }
             }
 
-            m_Presenter.NavigateForward();
+            if (m_Model.SetupModel.SetupMode == SetupMode.SkipConventions) {
+                try {
+                    Debug.Log("skipping setup...");
+                    new ButtrProjectScaffolder(
+                        m_Model.ProjectModel.ProjectName,
+                        m_Model.ProjectModel.ButtrVersion
+                    ).ExecuteSkipConventions();
+                } catch (Exception) {
+                    Debug.Log("Buttr Interrupted");
+                }
+            }
+            
             CloseRequested?.Invoke();
         }
         
         public void Dispose() {
-            m_View.Window1.OnSetupModeChanged -= OnSetupModeSelected;
+            m_View.Window.OnSetupModeChanged -= OnSetupModeSelected;
             
             m_View.Footer.OnLeftButtonClicked -= OnLeftFooterButtonClicked;
             m_View.Footer.OnRightButtonClicked -= OnRightFooterButtonClicked;

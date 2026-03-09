@@ -1,20 +1,26 @@
 {
   "name": "com.crumpetlabs.buttr",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "displayName": "Buttr",
   "description": "A lightweight DI framework, built for Unity",
-  "unity": "2021.1",
-  "unityRelease": "0b5",
-  "documentationUrl": "https://example.com/",
-  "changelogUrl": "https://example.com/changelog.html",
+  "unity": "6000",
+  "unityRelease": "0b1",
+  "documentationUrl": "https://github.com/FriedCrumpets/Buttr/blob/main/Assets/Plugins/Buttr/README.md",
+  "changelogUrl": "https://github.com/FriedCrumpets/Buttr/blob/main/Assets/Plugins/Buttr/CHANGELOG.md",
   "license": "MIT",
   "category": "Dependency Injection",
   "dependencies": { },
   "keywords": [
     "DI",
-    "Dependency Injection"
-  ],  "author": {
-    "name": "Crumpet Labs",
-    "url": "https://www.crumpetIndustries.com"
+    "Dependency Injection",
+    "Architecture",
+    "Source Generation",
+    "Roslyn",
+    "IoC",
+    "Scaffolding"
+  ], 
+  "author": {
+    "name": "Jamie Mullis",
+    "url": "https://www.jamiemullis.com"
   }
 }

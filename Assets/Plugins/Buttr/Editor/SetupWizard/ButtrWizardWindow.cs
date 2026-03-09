@@ -1,4 +1,3 @@
-using System.Threading;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -16,6 +15,13 @@ namespace Buttr.Editor.SetupWizard {
 
         private ButtrWizardMediator m_Mediator;
 
+        [InitializeOnLoadMethod]
+        private static void ShowIfNotSetup() {
+            if (ButtrProjectScaffolder.HasBeenSetUp) return;
+
+            EditorApplication.delayCall += ShowWindow;
+        }
+
         [MenuItem("Tools/Buttr/Setup Wizard")]
         internal static void ShowWindow() {
             var window = GetWindow<ButtrWizardWindow>(true, "Buttr Setup Wizard");
@@ -24,6 +30,8 @@ namespace Buttr.Editor.SetupWizard {
             window.maxSize = new Vector2(WindowWidth, WindowHeight);
 
             window.Show();
+            
+            EditorApplication.delayCall -= ShowWindow;
         }
 
         private void CreateGUI() {

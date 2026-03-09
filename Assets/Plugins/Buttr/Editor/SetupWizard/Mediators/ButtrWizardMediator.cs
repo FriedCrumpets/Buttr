@@ -31,7 +31,7 @@ namespace Buttr.Editor.SetupWizard {
             m_View = view;
             
             m_ViewMediator = new ButtrWizardViewMediator(model, view, presenter);
-            m_ModelMediator = new ButtrWizardModelMediator(model, view, presenter);
+            m_ModelMediator = new ButtrWizardModelMediator(model, view);
 
             m_ViewMediator.CloseRequested += HandleCloseRequested;
         }
@@ -45,13 +45,12 @@ namespace Buttr.Editor.SetupWizard {
         /// Call once after construction to sync UI with defaults.
         /// </summary>
         internal void Initialize() {
-            m_View.Window1.ButtrVersion = m_Model.ProjectModel.ButtrVersion;
-            m_View.Window1.UnityVersion = m_Model.ProjectModel.UnityVersion;
-            m_View.Window1.Project = m_Model.ProjectModel.ProjectName;
+            m_View.Window.ButtrVersion = m_Model.ProjectModel.ButtrVersion;
+            m_View.Window.UnityVersion = m_Model.ProjectModel.UnityVersion;
+            m_View.Window.Project = m_Model.ProjectModel.ProjectName;
             
-            m_View.NavigateToPage(m_Model.PageModel.CurrentPage);
-            m_View.Window1.SetupRadioGroup.value = (int)(m_Model.SetupModel.SetupMode);
-            m_View.Window1.Description = m_Model.SetupModel.SetupMode.GetSetupDescription();
+            m_View.Window.SetupRadioGroup.value = (int)(m_Model.SetupModel.SetupMode);
+            m_View.Window.Description = m_Model.SetupModel.SetupMode.GetSetupDescription();
 
             m_View.Footer.LeftButtonText = SetupWizardStrings.Skip;
             m_View.Footer.LeftButtonEnabled = true;

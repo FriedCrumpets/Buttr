@@ -5,7 +5,6 @@ namespace Buttr.Editor.SetupWizard
     /// </summary>
     internal enum SetupMode {
         QuickSetup = 0,
-        SkipConventions = 1,
-        CustomSetup = 2
+        SkipConventions = 1
     }
 }

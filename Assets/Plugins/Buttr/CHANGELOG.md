@@ -1,9 +1,83 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+All notable changes to Buttr will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.0.0] - 2026-03-09
 
+### ⚠️ Breaking Changes
+
+- **Folder structure renamed:** `_Buttr/` is now `_Project/`. Existing projects must rename their root folder.
+- **`Database/` renamed to `Catalog/`:** ScriptableObject data assets now live in `Catalog/`, organised by feature.
+- **`[InjectScope("key")]` removed:** Unified into `[Inject("scope")]` with an optional scope parameter. All usages of `[InjectScope]` must be updated to `[Inject("scope")]`.
+- **Disk-based source generation removed:** The `EditorApplication.delayCall` injection code generator, `InjectionCacheManager`, `InjectionCodeGenerator`, `InjectionCodeGeneratorUtility`, `InjectionConfiguration`, and all cache types (`CachedEntry`, `CachePair`, `CacheWrapper`) have been removed. Source generation is now handled entirely by Roslyn source generators at compile time.
+- **Generated `*_Inject.g.cs` files removed from disk:** Injection code is now generated in-memory by the compiler. Delete any previously generated files from your project.
+- **Controller renamed from Presenter (MonoBehaviour):** The MonoBehaviour coordination type is now called `Controller`. The `Presenter` suffix is reserved for plain C# classes that mutate Model state. This resolves the previous naming collision.
+- **Loader assets relocated:** Loader `.asset` files now live in the package's `Loaders/` folder alongside the Loader script, not in `Catalog/`.
+
+### Added
+
+#### Source Generation & Analyzers
+- **Roslyn source generators** replacing the entire editor injection pipeline. Zero runtime reflection, no files on disk, no stale cache, incremental compilation support.
+- **BUTTR001** — Error: `[Inject]` used on a non-partial MonoBehaviour.
+- **BUTTR002** — Warning: Hidden type injected via `[Inject]` attribute.
+- **BUTTR003** — Warning: Hidden type resolved via `Application.Get<T>()`.
+- **BUTTR004** — Warning: Unresolvable constructor parameter (type not registered in any visible container).
+- **BUTTR005** — Warning: Registered type never used (no `[Inject]` field, no `Get<T>()` call, no constructor parameter referencing it).
+- **BUTTR006** — Error: Duplicate registration of the same type in the same container.
+- **BUTTR008** — Warning: Registration issues in configurable collections.
+- **BUTTR009** — Warning: Magic string used as scope key instead of a constant.
+
+#### Setup Wizard
+- **Two-path setup wizard:** Quick Setup (one-click scaffolding with all conventions) and Skip Conventions (standalone DI framework, no scaffolding).
+- **Project scaffolding:** Generates `_Project/` folder structure, `Program.cs`, `ProgramLoader.cs`, assembly definition, boot scene with `UnityApplicationBoot`, and build settings configuration.
+- **Post-compile asset creation:** `ButtrPostCompileHook` automatically creates `ProgramLoader.asset` after Unity compiles the generated scripts.
+- **Setup version tracking:** `EditorPrefs` stores the Buttr version used during setup, enabling future upgrade detection.
+
+#### Editor Tooling
+- **Right-click "New Feature":** Scaffolds a full feature package with Package extension, asmdef, README, Model, Presenter, Mediator, Service + Contract, View, and Loader. Optional additions: Handlers, Behaviours, Identifiers, Configurations, Common, Exceptions.
+- **Right-click "New Core Package":** Same as New Feature but generates `ApplicationBuilder` registrations instead of `ScopeBuilder`.
+- **Right-click "Add to Package":** 17 individual type scaffolders grouped by architectural layer (Unity, Data, Logic, Infrastructure, Structure). Each creates the correct subfolder and templated file with proper naming, namespace, and constructor injection.
+- **Layered menu structure:** Add to Package options grouped as Unity (Controller, View), Data (Model, Identifier, Definition, Configuration), Logic (Presenter, System, Mediator, Handler, Behaviour), Infrastructure (Service + Contract, Repository, Registry, Loader), Structure (Extensions).
+- **Smart package detection:** Menu items use asmdef-based package root detection. Add to Package options only appear when right-clicking inside a package.
+- **Convention structure validation:** All scaffolding menu items are greyed out unless `_Project/` with an asmdef exists.
+- **Per-package assembly definitions:** Each scaffolded package gets its own asmdef with correct namespace and Buttr references.
+- **Dependency-aware scaffolding:** Adding a Registry automatically scaffolds its Identifier and Controller dependencies. Adding a System or Behaviour scaffolds the Context struct. Adding a Service scaffolds the Contract interface.
+- **Post-compile ScriptableObject creation:** Loader and Configuration assets are queued and created automatically after Unity compiles the generated scripts.
+- **Package README generation:** Each scaffolded package includes a README with package type, usage example, and placeholder sections.
+
+#### Runtime
+- **ScriptableInjector:** Expression tree-based utility for injecting ScriptableObjects into any Buttr container without per-type Loader boilerplate. Drag ScriptableObjects into the inspector list and they're registered automatically.
+- **`CMDArgs` utility:** Static utility that parses command line arguments via `RuntimeInitializeOnLoadMethod`, making launch arguments available to `Program.Main()`.
+
+#### Architecture Conventions
+- **17 named type conventions** across 5 layers (Unity, Data, Logic, Infrastructure, Structure) with defined suffixes, responsibilities, and folder locations.
+- **System/Behaviour `Tick` pattern:** Systems use `Tick(Context ctx)` instead of `Update` to communicate loop-agnostic execution. Behaviours implement the same `Tick` method.
+- **Context structs:** Systems and Behaviours share a per-feature Context struct that bundles tick parameters.
+- **Registry with disposable registration:** `Register()` returns `IDisposable` for automatic deregistration. Private `Deregister` method prevents manual deregistration.
+- **Repository as interface:** Repository scaffolds as a generic `IRepository<TKey, TData>` contract in `Contracts/`, not a concrete class.
+- **Scope boundary documentation:** Design Philosophy section clarifies that Buttr handles feature-level singleton architecture, not per-instance entity management.
+
+### Changed
+
+- **`Program.cs` convention:** Application composition entry point following .NET conventions. Generated by the setup wizard with `CMDArgs` overload pattern.
+- **`ProgramLoader` convention:** Thin `UnityApplicationLoaderBase` shell that calls `Program.Main()`. Generated alongside `Program.cs`.
+- **Extensions are internal:** Extension classes are generated as `internal static class` to keep package internals private.
+- **Feature packages use `ScopeBuilder`:** Scaffolded features register dependencies in scoped containers with a const scope key. Core packages use `ApplicationBuilder`.
+- **ScriptableObject `CreateAssetMenu` uses project namespace:** Generated Loaders, Definitions, and Configurations use `{ProjectName}/Loaders/{Name}` instead of `Buttr/Loaders/{Name}`.
+- **Catalog no longer stores Loader assets:** Loader assets live in the package's `Loaders/` folder. Catalog stores only Configurations, Definitions, and Handlers.
+- **Project README updated:** Comprehensive architecture guide with all 17 conventions, feature structure examples, Catalog mirroring, and editor tooling documentation.
+- **GitHub README updated:** Reflects two-path wizard, editor tooling features, updated scaffold structure, and corrected roadmap.
+
+### Removed
+
+- **`InjectionConfiguration` ScriptableObject:** No longer needed — source generation is handled by Roslyn at compile time.
+- **All disk-based injection cache types:** `CachedEntry`, `CachePair`, `CacheWrapper`, `InjectionCacheManager`.
+- **`InjectionCodeGenerator` and related editor classes:** Replaced entirely by Roslyn source generators.
+- **`buttr.config` file:** Configuration file concept removed. Setup state tracked via EditorPrefs.
+
+### Fixed
+
+- **Stale generated file compilation errors:** Moving from disk-based to in-memory source generation eliminates the class of bugs where removing an `[Inject]` field left orphaned generated code that caused compilation errors.
+- **Cross-assembly analyzer false positives:** Analyzers use warning-level diagnostics for cross-container issues while keeping definitively wrong problems (like missing `partial`) as errors.

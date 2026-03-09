@@ -1,5 +1,4 @@
 <p align="center">
-  <!-- Replace with actual logo path -->
   <img src="Docs/Images/buttr-wordmark.svg" alt="Buttr Logo" width="400"/>
 </p>
 
@@ -36,6 +35,7 @@ It's small by design, built to fit into existing `MonoSingleton` architectures w
 - **Source Generation** — `[Inject]` and `[Inject("scope")]` attributes generate injection code at compile time. No runtime reflection.
 - **Roslyn Analyzers** — Catch common DI mistakes before you hit play. Missing registrations, incorrect attribute usage, and structural issues are flagged as compiler warnings and errors.
 - **Setup Wizard** — Install via UPM, open Unity, and the setup wizard scaffolds your project structure automatically.
+- **Editor Tooling** — Right-click context menus to scaffold features, core packages, and individual types with full naming conventions and constructor injection wired up.
 - **Application Containers** — Build application-wide dependencies with `ApplicationBuilder` and access them anywhere via `Application.Get<T>()`.
 - **Scoped Containers** — Create isolated dependency scopes with `ScopeBuilder` for feature-specific resolution.
 - **Configurable Packages** — Bundle reusable DI configurations with `ConfigurableCollection` for plug-and-play package development.
@@ -70,10 +70,9 @@ After installing Buttr, the setup wizard will appear automatically when you open
   <img src="docs/images/setup-wizard.png" alt="Buttr Setup Wizard" width="450"/>
 </p>
 
-The wizard displays your project name, Unity version, and Buttr version. It offers three paths:
+The wizard displays your project name, Unity version, and Buttr version. It offers two paths:
 
-- **Quick Setup** — Accepts all convention defaults. Scaffolds `_Project/`, creates the boot scene, generates `Program.cs` and `ProgramLoader`, and configures build settings. One click and you're ready to build.
-- **Custom Setup** — Walks you through each decision: create `_Project/`? Use the boot scene? Add to build settings? Each option defaults to the convention preference but can be changed.
+- **Quick Setup** — Accepts all convention defaults. Scaffolds `_Project/`, creates the boot scene, generates `Program.cs`, `ProgramLoader`, and an assembly definition, and configures build settings. One click and you're ready to build.
 - **Skip Conventions** — Installs Buttr as a standalone DI framework with no folder structure or scaffolding. Use the container on its own and adopt conventions later if you choose.
 
 With Quick Setup, Buttr will scaffold the following structure in your `Assets` folder:
@@ -81,16 +80,25 @@ With Quick Setup, Buttr will scaffold the following structure in your `Assets` f
 ```
 Assets/
 └── _Project/
-    ├── Main.unity          # Boot scene (added to build settings at index 0)
-    ├── Program.cs          # Application composition entry point
-    ├── README.md           # Usage documentation
-    ├── Core/               # Core packages used by features
-    ├── Features/           # Feature-specific packages
-    ├── Shared/             # Assets and scripts shared across Core and Features
-    └── Catalog/            # ScriptableObjects, SQLite databases, and data assets
+    ├── {ProjectName}.asmdef  # Assembly definition for the project
+    ├── Main.unity            # Boot scene (added to build settings at index 0)
+    ├── Program.cs            # Application composition entry point
+    ├── README.md             # Usage documentation
+    ├── Core/                 # Core packages used by features
+    ├── Features/             # Feature-specific packages
+    ├── Shared/               # Assets and scripts shared across Core and Features
+    └── Catalog/              # ScriptableObject data assets, organised by feature
 ```
 
 You can re-run the wizard at any time from `Tools > Buttr > Setup Project`.
+
+### Editor Tooling
+
+Buttr provides right-click context menus in the Project window under `Right-Click > Buttr > Packages`.
+
+**New Feature** and **New Core Package** prompt for a name and scaffold the full package structure — package entry point, assembly definition, Components folder with a Model, Presenter, Mediator, and Service, Contracts folder with the service interface, MonoBehaviours folder with a View, and a Loader. All classes are correctly named, sealed, and wired with constructor injection.
+
+**Add to Package** lets you add individual types to an existing package, grouped by architectural layer: Unity (Controller, View), Data (Model, Identifier, Definition, Configuration), Logic (Presenter, System, Mediator, Handler, Behaviour), Infrastructure (Service + Contract, Repository, Registry, Loader), and Structure (Extensions). Types that have dependencies — like Registry which requires an Identifier and Controller — scaffold those dependencies automatically.
 
 ### Boot Scene
 
@@ -98,11 +106,13 @@ The generated `Main.unity` scene contains a single `Boot` GameObject with the `U
 
 `UnityApplicationBoot` loads `UnityApplicationLoaderBase` ScriptableObjects in sequence, providing a clean async/await pipeline for bootstrapping your application.
 
-`Program.cs` separates your application composition from Unity's boot lifecycle. By moving composition into a standard C# entry point, you can see your entire game's dependency structure in a single file. This prevents dependencies from being scattered across scene hierarchies and makes your architecture testable without the Unity Editor.
+`Program.cs` separates your application composition from Unity's boot lifecycle. Buttr also provides `CMDArgs`, a static utility that parses command line arguments before anything else runs, making launch arguments available for build configurations, server flags, and debug modes.
 
 ```csharp
 public static class Program {
-    public static ApplicationLifetime Main() {
+    public static ApplicationLifetime Main() => Main(CMDArgs.Read());
+
+    private static ApplicationLifetime Main(IDictionary<string, string> args) {
         var builder = new ApplicationBuilder();
 
         builder.UseConsole();
@@ -121,8 +131,9 @@ The wizard also generates a `ProgramLoader` — a thin `UnityApplicationLoaderBa
 public sealed class ProgramLoader : UnityApplicationLoaderBase {
     private ApplicationLifetime m_Lifetime;
 
-    public override async Awaitable LoadAsync(CancellationToken cancellationToken) {
+    public override Awaitable LoadAsync(CancellationToken cancellationToken) {
         m_Lifetime = Program.Main();
+        return AwaitableUtility.CompletedTask;
     }
 
     public override Awaitable UnloadAsync() {
@@ -132,7 +143,7 @@ public sealed class ProgramLoader : UnityApplicationLoaderBase {
 }
 ```
 
-All composition lives in `Program.cs`. The Loader is just the bridge to Unity's lifecycle. Both are generated by the setup wizard and can be opted out of during project configuration.
+All composition lives in `Program.cs`. The Loader is just the bridge to Unity's lifecycle. Both are generated by the setup wizard.
 
 ### Application Container
 
@@ -304,9 +315,9 @@ Buttr enforces a feature-based project structure rather than the traditional Uni
 | `Core/` | Game-agnostic packages reusable across projects |
 | `Features/` | Game-specific feature packages |
 | `Shared/` | Assets and scripts used by both Core and Features |
-| `Catalog/` | ScriptableObjects, SQLite databases, and data assets |
+| `Catalog/` | ScriptableObject data assets, organised by feature |
 
-For a detailed guide on naming conventions, folder structure, and the Model-View-Presenter architecture recommended by Buttr, see the [Architecture Guide](Assets/_Project/README.md) that ships with your project after running the setup wizard.
+For a detailed guide on naming conventions, folder structure, and the architectural patterns recommended by Buttr, see the [Architecture Guide](Docs/PROJECT_README.md).
 
 ## Requirements
 
@@ -315,13 +326,14 @@ For a detailed guide on naming conventions, folder structure, and the Model-View
 
 ## Roadmap
 
-- [ ] WebGL, and console platform testing
+- [ ] WebGL and console platform testing
 - [ ] Additional Roslyn analyzer rules
-- [ ] Editor tooling improvements
+- [ ] Scope Visualiser editor window
+- [ ] Dependency graph editor window
 
 ## Documentation
 
-- **[Architecture Guide](Assets/_Project/README.md)** — Naming conventions, folder structure, design philosophy, and the Model-View-Presenter pattern recommended by Buttr. Ships with your project after running the setup wizard.
+- **[Architecture Guide](Docs/PROJECT_README.md)** — Naming conventions, folder structure, design philosophy, and the architectural patterns recommended by Buttr.
 
 Additional documentation including API reference and tutorials is planned.
 

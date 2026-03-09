@@ -262,10 +262,7 @@ namespace {sanitisedName} {{
             Debug.Log("[Buttr] Running post-compilation setup...");
 
             try {
-                var loaderAsset = CreateProgramLoaderAsset();
-
-                if (loaderAsset != null)
-                    WireProgramLoaderToBootScene(loaderAsset);
+                CreateProgramLoaderAsset();
 
                 Debug.Log("[Buttr] Setup complete — ProgramLoader asset created and wired to boot scene.");
             }
@@ -307,56 +304,6 @@ namespace {sanitisedName} {{
             
             Debug.Log($"[Buttr] Created {CatalogFolder}/{ProgramLoaderAssetName}");
             return instance as UnityApplicationLoaderBase;
-        }
-
-        private static void WireProgramLoaderToBootScene(UnityApplicationLoaderBase loaderAsset) {
-            var scenePath = $"Assets/{RootFolder}/{SceneName}";
-
-            if (loaderAsset == null) {
-                Debug.LogWarning("[Buttr] ProgramLoader asset not found — wire manually in the Boot component inspector");
-                return;
-            }
-
-            // Open the boot scene so we can modify it
-            var scene = EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Single);
-
-            var boot = UnityEngine.Object.FindFirstObjectByType<UnityApplicationBoot>();
-
-            if (boot == null) {
-                Debug.LogWarning("[Buttr] UnityApplicationBoot not found in Main.unity — wire ProgramLoader manually");
-                return;
-            }
-
-            var so = new SerializedObject(boot);
-            var prop = so.FindProperty("m_ApplicationLoaders");
-
-            if (prop == null || false == prop.isArray) {
-                Debug.LogWarning("[Buttr] Could not find 'm_ApplicationLoaders' on UnityApplicationBoot — wire ProgramLoader manually");
-                return;
-            }
-
-            // Only wire if not already assigned
-            var alreadyWired = false;
-
-            for (var i = 0; i < prop.arraySize; i++) {
-                if (prop.GetArrayElementAtIndex(i).objectReferenceValue == loaderAsset) {
-                    alreadyWired = true;
-                    break;
-                }
-            }
-
-            if (alreadyWired) {
-                Debug.Log("[Buttr] ProgramLoader already wired to boot scene — skipping");
-                return;
-            }
-
-            var index = prop.arraySize;
-            prop.arraySize = index + 1;
-            prop.GetArrayElementAtIndex(index).objectReferenceValue = loaderAsset;
-            so.ApplyModifiedPropertiesWithoutUndo();
-
-            EditorSceneManager.SaveScene(scene);
-            Debug.Log("[Buttr] Wired ProgramLoader to Boot component in Main.unity");
         }
 
         // ── EditorPref ───────────────────────────────────────────────
