@@ -3,7 +3,7 @@ namespace Buttr.Editor.SetupWizard
     /// <summary>
     /// UXML element name constants for the Setup Wizard.
     /// </summary>
-    internal static class SetupWizardElements
+    internal static class ButtrWizardElements
     {
         // ── Core Window ──────────────────────────────────────────────
         internal const string CoreWindow = "CoreWindow";

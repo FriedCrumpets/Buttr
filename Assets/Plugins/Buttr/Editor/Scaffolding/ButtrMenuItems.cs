@@ -44,7 +44,7 @@ namespace Buttr.Editor.Scaffolding {
 
         [MenuItem("Assets/Buttr/Packages/Add to Package/Unity/Controller", false, BasePriority)]
         private static void AddController() {
-            new AddControllerCommand(ButtrMenuItemsUtility.FindPackageRoot()).Execute();
+            new AddControllerCommand(ButtrMenuItemsUtility.FindPackageRoot(), true).Execute();
         }
 
         [MenuItem("Assets/Buttr/Packages/Add to Package/Unity/Controller", true)]
@@ -54,7 +54,7 @@ namespace Buttr.Editor.Scaffolding {
 
         [MenuItem("Assets/Buttr/Packages/Add to Package/Unity/View", false, BasePriority + 1)]
         private static void AddView() {
-            new AddViewCommand(ButtrMenuItemsUtility.FindPackageRoot()).Execute();
+            new AddViewCommand(ButtrMenuItemsUtility.FindPackageRoot(), true).Execute();
         }
 
         [MenuItem("Assets/Buttr/Packages/Add to Package/Unity/View", true)]
@@ -66,7 +66,7 @@ namespace Buttr.Editor.Scaffolding {
 
         [MenuItem("Assets/Buttr/Packages/Add to Package/Data/Model", false, BasePriority)]
         private static void AddModel() {
-            new AddModelCommand(ButtrMenuItemsUtility.FindPackageRoot()).Execute();
+            new AddModelCommand(ButtrMenuItemsUtility.FindPackageRoot(), true).Execute();
         }
 
         [MenuItem("Assets/Buttr/Packages/Add to Package/Data/Model", true)]
@@ -76,7 +76,7 @@ namespace Buttr.Editor.Scaffolding {
 
         [MenuItem("Assets/Buttr/Packages/Add to Package/Data/Identifier", false, BasePriority + 1)]
         private static void AddIdentifier() {
-            new AddIdentifierCommand(ButtrMenuItemsUtility.FindPackageRoot()).Execute();
+            new AddIdentifierCommand(ButtrMenuItemsUtility.FindPackageRoot(), true).Execute();
         }
 
         [MenuItem("Assets/Buttr/Packages/Add to Package/Data/Identifier", true)]
@@ -86,7 +86,7 @@ namespace Buttr.Editor.Scaffolding {
 
         [MenuItem("Assets/Buttr/Packages/Add to Package/Data/Definition", false, BasePriority + 2)]
         private static void AddDefinition() {
-            new AddDefinitionCommand(ButtrMenuItemsUtility.FindPackageRoot()).Execute();
+            new AddDefinitionCommand(ButtrMenuItemsUtility.FindPackageRoot(), true).Execute();
         }
 
         [MenuItem("Assets/Buttr/Packages/Add to Package/Data/Definition", true)]
@@ -96,7 +96,7 @@ namespace Buttr.Editor.Scaffolding {
 
         [MenuItem("Assets/Buttr/Packages/Add to Package/Data/Configuration", false, BasePriority + 3)]
         private static void AddConfiguration() {
-            new AddConfigurationCommand(ButtrMenuItemsUtility.FindPackageRoot()).Execute();
+            new AddConfigurationCommand(ButtrMenuItemsUtility.FindPackageRoot(), true).Execute();
         }
 
         [MenuItem("Assets/Buttr/Packages/Add to Package/Data/Configuration", true)]
@@ -108,7 +108,7 @@ namespace Buttr.Editor.Scaffolding {
 
         [MenuItem("Assets/Buttr/Packages/Add to Package/Logic/Presenter", false, BasePriority)]
         private static void AddPresenter() {
-            new AddPresenterCommand(ButtrMenuItemsUtility.FindPackageRoot()).Execute();
+            new AddPresenterCommand(ButtrMenuItemsUtility.FindPackageRoot(), true).Execute();
         }
 
         [MenuItem("Assets/Buttr/Packages/Add to Package/Logic/Presenter", true)]
@@ -118,7 +118,7 @@ namespace Buttr.Editor.Scaffolding {
 
         [MenuItem("Assets/Buttr/Packages/Add to Package/Logic/System", false, BasePriority + 1)]
         private static void AddSystem() {
-            new AddSystemCommand(ButtrMenuItemsUtility.FindPackageRoot()).Execute();
+            new AddSystemCommand(ButtrMenuItemsUtility.FindPackageRoot(), true).Execute();
         }
 
         [MenuItem("Assets/Buttr/Packages/Add to Package/Logic/System", true)]
@@ -128,7 +128,7 @@ namespace Buttr.Editor.Scaffolding {
 
         [MenuItem("Assets/Buttr/Packages/Add to Package/Logic/Mediator", false, BasePriority + 2)]
         private static void AddMediator() {
-            new AddMediatorCommand(ButtrMenuItemsUtility.FindPackageRoot()).Execute();
+            new AddMediatorCommand(ButtrMenuItemsUtility.FindPackageRoot(), true).Execute();
         }
 
         [MenuItem("Assets/Buttr/Packages/Add to Package/Logic/Mediator", true)]
@@ -138,7 +138,7 @@ namespace Buttr.Editor.Scaffolding {
 
         [MenuItem("Assets/Buttr/Packages/Add to Package/Logic/Handler", false, BasePriority + 3)]
         private static void AddHandler() {
-            new AddHandlerCommand(ButtrMenuItemsUtility.FindPackageRoot()).Execute();
+            new AddHandlerCommand(ButtrMenuItemsUtility.FindPackageRoot(), true).Execute();
         }
 
         [MenuItem("Assets/Buttr/Packages/Add to Package/Logic/Handler", true)]
@@ -148,7 +148,7 @@ namespace Buttr.Editor.Scaffolding {
 
         [MenuItem("Assets/Buttr/Packages/Add to Package/Logic/Behaviour", false, BasePriority + 4)]
         private static void AddBehaviour() {
-            new AddBehaviourCommand(ButtrMenuItemsUtility.FindPackageRoot()).Execute();
+            new AddBehaviourCommand(ButtrMenuItemsUtility.FindPackageRoot(), true).Execute();
         }
 
         [MenuItem("Assets/Buttr/Packages/Add to Package/Logic/Behaviour", true)]
@@ -160,7 +160,7 @@ namespace Buttr.Editor.Scaffolding {
 
         [MenuItem("Assets/Buttr/Packages/Add to Package/Infrastructure/Service + Contract", false, BasePriority)]
         private static void AddServiceAndContract() {
-            new AddServiceAndContractCommand(ButtrMenuItemsUtility.FindPackageRoot()).Execute();
+            new AddServiceAndContractCommand(ButtrMenuItemsUtility.FindPackageRoot(), true).Execute();
         }
 
         [MenuItem("Assets/Buttr/Packages/Add to Package/Infrastructure/Service + Contract", true)]
@@ -170,7 +170,7 @@ namespace Buttr.Editor.Scaffolding {
 
         [MenuItem("Assets/Buttr/Packages/Add to Package/Infrastructure/Repository", false, BasePriority + 1)]
         private static void AddRepository() {
-            new AddRepositoryCommand(ButtrMenuItemsUtility.FindPackageRoot()).Execute();
+            new AddRepositoryCommand(ButtrMenuItemsUtility.FindPackageRoot(), true).Execute();
         }
 
         [MenuItem("Assets/Buttr/Packages/Add to Package/Infrastructure/Repository", true)]
@@ -180,7 +180,7 @@ namespace Buttr.Editor.Scaffolding {
 
         [MenuItem("Assets/Buttr/Packages/Add to Package/Infrastructure/Registry", false, BasePriority + 2)]
         private static void AddRegistry() {
-            new AddRegistryCommand(ButtrMenuItemsUtility.FindPackageRoot()).Execute();
+            new AddRegistryCommand(ButtrMenuItemsUtility.FindPackageRoot(), true).Execute();
         }
 
         [MenuItem("Assets/Buttr/Packages/Add to Package/Infrastructure/Registry", true)]
@@ -190,7 +190,7 @@ namespace Buttr.Editor.Scaffolding {
 
         [MenuItem("Assets/Buttr/Packages/Add to Package/Infrastructure/Loader", false, BasePriority + 3)]
         private static void AddLoader() {
-            new AddLoaderCommand(ButtrMenuItemsUtility.FindPackageRoot(), ButtrMenuItemsUtility.InferPackageType()).Execute();
+            new AddLoaderCommand(ButtrMenuItemsUtility.FindPackageRoot(), ButtrMenuItemsUtility.InferPackageType(), true).Execute();
         }
 
         [MenuItem("Assets/Buttr/Packages/Add to Package/Infrastructure/Loader", true)]
@@ -202,7 +202,7 @@ namespace Buttr.Editor.Scaffolding {
 
         [MenuItem("Assets/Buttr/Packages/Add to Package/Structure/Extensions", false, BasePriority)]
         private static void AddExtensions() {
-            new AddExtensionsCommand(ButtrMenuItemsUtility.FindPackageRoot()).Execute();
+            new AddExtensionsCommand(ButtrMenuItemsUtility.FindPackageRoot(), true).Execute();
         }
 
         [MenuItem("Assets/Buttr/Packages/Add to Package/Structure/Extensions", true)]

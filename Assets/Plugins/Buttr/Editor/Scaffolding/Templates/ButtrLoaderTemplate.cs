@@ -22,11 +22,16 @@ using UnityEngine;
 namespace {m_Ns} {{
     [CreateAssetMenu(fileName = ""{m_Name}Loader"", menuName = ""{m_ProjectName}/Loaders/{m_Name}"", order = 0)]
     public sealed class {m_Name}Loader : UnityApplicationLoaderBase {{
+        [SerializeField] private ScriptableInjector m_Injector;
+
         private IDIContainer m_Container;
 
         public override Awaitable LoadAsync(CancellationToken cancellationToken) {{
             var builder = new ScopeBuilder({m_Name}Package.Scope);
+
             builder.Use{m_Name}();
+            m_Injector.Inject(builder);
+
             m_Container = builder.Build();
             return AwaitableUtility.CompletedTask;
         }}

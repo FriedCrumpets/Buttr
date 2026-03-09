@@ -1,9 +1,11 @@
 namespace Buttr.Editor.Scaffolding {
     internal readonly ref struct AddViewCommand {
         private readonly string m_PackageFolder;
+        private readonly bool m_RefreshAssetDatabase;
 
-        public AddViewCommand(string packageFolder) {
+        public AddViewCommand(string packageFolder, bool refreshAssetDatabase) {
             m_PackageFolder = packageFolder;
+            m_RefreshAssetDatabase = refreshAssetDatabase;
         }
 
         public void Execute() {

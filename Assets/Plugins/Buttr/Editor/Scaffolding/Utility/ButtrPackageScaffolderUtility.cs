@@ -12,9 +12,11 @@ namespace Buttr.Editor.Scaffolding {
         public static string ResolveNamespace(this string parentFolder, string packageName) {
             var dataPath = Application.dataPath;
             var projectFolder = Path.Combine(dataPath, "_Project");
-
-            if (false == parentFolder.StartsWith(projectFolder))
+            projectFolder = projectFolder.Replace('/', '\\');
+            
+            if (false == parentFolder.StartsWith(projectFolder)) {
                 return packageName;
+            }
 
             var relative = parentFolder[projectFolder.Length..]
                 .TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
@@ -81,7 +83,7 @@ namespace Buttr.Editor.Scaffolding {
             File.WriteAllText(Path.Combine(folder, fileName), content);
         }
 
-        public static void WriteFileIfNew(this string folder, string fileName, string content) {
+        public static void WriteFileIfNew(this string folder, string fileName, string content, bool refresh = false) {
             var path = Path.Combine(folder, fileName);
 
             if (File.Exists(path)) {
@@ -90,7 +92,7 @@ namespace Buttr.Editor.Scaffolding {
             }
 
             File.WriteAllText(path, content);
-            AssetDatabase.Refresh();
+            if(refresh) AssetDatabase.Refresh();
             Debug.Log($"[Buttr] Created {fileName}");
         }
 

@@ -58,12 +58,21 @@ namespace Buttr.Editor.Scaffolding {
             }
 
             var directory = Path.GetDirectoryName(assetPath);
-
+            directory = directory?.Replace('\\', '/');
+            
             if (false == string.IsNullOrEmpty(directory) && false == Directory.Exists(directory))
                 Directory.CreateDirectory(directory);
 
             var instance = ScriptableObject.CreateInstance(targetType);
-            AssetDatabase.CreateAsset(instance, assetPath);
+            
+            // Normalise to Assets-relative path with forward slashes
+            if (assetPath.Contains(Application.dataPath)) {
+                assetPath = "Assets" + assetPath.Substring(Application.dataPath.Length);
+            }
+
+            assetPath = assetPath.Replace('\\', '/');
+            
+            AssetDatabase.CreateAsset(instance, assetPath); // error throws here
             AssetDatabase.SaveAssets();
 
             Debug.Log($"[Buttr] Created {Path.GetFileName(assetPath)}");

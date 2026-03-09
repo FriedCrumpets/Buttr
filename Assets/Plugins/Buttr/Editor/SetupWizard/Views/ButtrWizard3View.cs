@@ -11,9 +11,9 @@ namespace Buttr.Editor.SetupWizard {
         public ButtrWizard3View(VisualElement root) {
             m_Root = root;
             
-            m_InstallerPanel = root.Q<VisualElement>(SetupWizardElements.Installer);
-            m_InstallingHeader = root.Q<Label>(SetupWizardElements.InstallerHeader);
-            m_InstallingSubheader = root.Q<VisualElement>(SetupWizardElements.InstallerAdditional)?.Q<Label>();
+            m_InstallerPanel = root.Q<VisualElement>(ButtrWizardElements.Installer);
+            m_InstallingHeader = root.Q<Label>(ButtrWizardElements.InstallerHeader);
+            m_InstallingSubheader = root.Q<VisualElement>(ButtrWizardElements.InstallerAdditional)?.Q<Label>();
         }
 
         public VisualElement Root {

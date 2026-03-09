@@ -20,12 +20,12 @@ namespace Buttr.Editor.SetupWizard {
         public ButtrWizard1View(VisualElement root) {
             m_Root = root;
             
-            m_SetupRadioGroup = root.Q<RadioButtonGroup>(SetupWizardElements.SetupRadioButtonGroup);
+            m_SetupRadioGroup = root.Q<RadioButtonGroup>(ButtrWizardElements.SetupRadioButtonGroup);
             
-            m_UnityVersionLabel = root.Q<Label>(SetupWizardElements.Window1UnityVersion);
-            m_ProjectLabel = root.Q<Label>(SetupWizardElements.Window1Project);
-            m_ButtrVersionLabel = root.Q<Label>(SetupWizardElements.Window1ButtrVersion);
-            m_DescriptionLabel = root.Q<Label>(SetupWizardElements.SetupDescriptionLabel);
+            m_UnityVersionLabel = root.Q<Label>(ButtrWizardElements.Window1UnityVersion);
+            m_ProjectLabel = root.Q<Label>(ButtrWizardElements.Window1Project);
+            m_ButtrVersionLabel = root.Q<Label>(ButtrWizardElements.Window1ButtrVersion);
+            m_DescriptionLabel = root.Q<Label>(ButtrWizardElements.SetupDescriptionLabel);
 
             m_SetupRadioGroup.UnregisterValueChangedCallback(OnSetupRadioGroupChanged);
             m_SetupRadioGroup.RegisterValueChangedCallback(OnSetupRadioGroupChanged);

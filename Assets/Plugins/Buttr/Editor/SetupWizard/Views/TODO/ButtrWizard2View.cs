@@ -41,9 +41,9 @@ namespace Buttr.Editor.SetupWizard {
             m_PersistenceTab = tabs.Count > 2 ? tabs[2] : null;
 
             // panels
-            m_FoldersPanel = root.Q<VisualElement>(SetupWizardElements.SetupFolders);
-            m_BootPanel = root.Q<VisualElement>(SetupWizardElements.SetupBoot);
-            m_RepositoryPanel = root.Q<VisualElement>(SetupWizardElements.SetupRepository);
+            m_FoldersPanel = root.Q<VisualElement>(ButtrWizardElements.SetupFolders);
+            m_BootPanel = root.Q<VisualElement>(ButtrWizardElements.SetupBoot);
+            m_RepositoryPanel = root.Q<VisualElement>(ButtrWizardElements.SetupRepository);
 
             // Structure
             var rootFolderConfig = m_FoldersPanel.Q<VisualElement>("RootFolder__Configuration");
@@ -55,16 +55,16 @@ namespace Buttr.Editor.SetupWizard {
             m_ScaffoldFolderNameField = scaffoldConfig?.Q<TextField>();
             m_AddFolderButton = scaffoldConfig?.Q<Button>();
 
-            m_FoldersTreeView = m_FoldersPanel.Q<TreeView>(SetupWizardElements.FoldersTreeView);
+            m_FoldersTreeView = m_FoldersPanel.Q<TreeView>(ButtrWizardElements.FoldersTreeView);
 
             // Boot
             var bootConfig = m_BootPanel.Q<VisualElement>("RootFolder__Configuration");
             m_CreateBootSceneToggle = bootConfig?.Q<Toggle>();
 
             // Persistence
-            m_SQLiteToggle = root.Q<Toggle>(SetupWizardElements.SQLiteToggle);
-            m_PlayerPrefsToggle = root.Q<Toggle>(SetupWizardElements.PlayerPrefsToggle);
-            m_CustomToggle = root.Q<Toggle>(SetupWizardElements.CustomToggle);
+            m_SQLiteToggle = root.Q<Toggle>(ButtrWizardElements.SQLiteToggle);
+            m_PlayerPrefsToggle = root.Q<Toggle>(ButtrWizardElements.PlayerPrefsToggle);
+            m_CustomToggle = root.Q<Toggle>(ButtrWizardElements.CustomToggle);
         }
     }
     

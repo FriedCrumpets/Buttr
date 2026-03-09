@@ -14,9 +14,9 @@ namespace Buttr.Editor.Scaffolding {
 namespace {m_Ns} {{
     public abstract class {m_Name}Handler : ScriptableObject {{
 
-        // TODO: Edit the below methods as required.
+        // Below are some examples of potential handler methods => create, remove, update or delete as required
         public abstract void Activated();
-        public abstract void Updated();
+        public abstract void Tick();
         public abstract void Deactivated();
         public abstract void Cancelled();
     }}

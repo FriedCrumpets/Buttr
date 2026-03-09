@@ -10,6 +10,8 @@ namespace Buttr.Core {
     }
     
     public interface IDIBuilder {
+        IResolverCollection Resolvers { get; }
+        IResolverCollection Hidden { get; }
         IConfigurable<TConcrete> AddTransient<TConcrete>();
         IConfigurable<TConcrete> AddTransient<TAbstract, TConcrete>() where TConcrete : TAbstract;
         IConfigurable<TConcrete> AddSingleton<TConcrete>();

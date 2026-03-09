@@ -10,10 +10,10 @@ namespace Buttr.Editor.SetupWizard {
         private readonly Button m_RightButton;
         
         public ButtrWizardFooterView(VisualElement root) {
-            m_LeftButton = root.Q<Button>(SetupWizardElements.FooterLeftButton);
+            m_LeftButton = root.Q<Button>(ButtrWizardElements.FooterLeftButton);
             m_LeftButton.clicked += HandleLeftButtonClicked;
             
-            m_RightButton = root.Q<Button>(SetupWizardElements.FooterRightButton);
+            m_RightButton = root.Q<Button>(ButtrWizardElements.FooterRightButton);
             m_RightButton.clicked += HandleRightButtonClicked;
         }
 

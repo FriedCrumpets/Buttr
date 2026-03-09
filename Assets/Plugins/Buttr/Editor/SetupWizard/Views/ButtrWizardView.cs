@@ -1,6 +1,5 @@
 using System;
 using UnityEngine.UIElements;
-using E = Buttr.Editor.SetupWizard.SetupWizardElements;
 
 namespace Buttr.Editor.SetupWizard {
     internal sealed class ButtrWizardView : IDisposable {
@@ -9,9 +8,9 @@ namespace Buttr.Editor.SetupWizard {
         private readonly ButtrWizardFooterView m_Footer;
         
         internal ButtrWizardView(VisualElement root) {
-            m_Window1 = new ButtrWizard1View(root.Q<VisualElement>(E.Window1));
-            m_Window3 = new ButtrWizard3View(root.Q<VisualElement>(E.Window3));
-            m_Footer = new ButtrWizardFooterView(root.Q<VisualElement>(E.Footer));
+            m_Window1 = new ButtrWizard1View(root.Q<VisualElement>(ButtrWizardElements.Window1));
+            m_Window3 = new ButtrWizard3View(root.Q<VisualElement>(ButtrWizardElements.Window3));
+            m_Footer = new ButtrWizardFooterView(root.Q<VisualElement>(ButtrWizardElements.Footer));
         }
         
         public ButtrWizard1View Window1 => m_Window1;

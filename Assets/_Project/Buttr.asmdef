@@ -1,0 +1,17 @@
+{
+    "name": "Buttr",
+    "rootNamespace": "Buttr",
+    "references": [
+        "Buttr.Core",
+        "Buttr.Unity"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

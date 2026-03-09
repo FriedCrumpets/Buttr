@@ -1,5 +1,3 @@
-using UnityEngine.UIElements;
-
 namespace Buttr.Editor.SetupWizard
 {
     /// <summary>
