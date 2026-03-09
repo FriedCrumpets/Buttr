@@ -333,7 +333,7 @@ For a detailed guide on naming conventions, folder structure, and the architectu
 
 ## Documentation
 
-- **[Architecture Guide](Docs/PROJECT_README.md)** — Naming conventions, folder structure, design philosophy, and the architectural patterns recommended by Buttr.
+- **[Architecture Guide](Assets/Docs/README.md)** — Naming conventions, folder structure, design philosophy, and the architectural patterns recommended by Buttr.
 
 Additional documentation including API reference and tutorials is planned.
 
