@@ -52,7 +52,7 @@ It's small by design, built to fit into existing `MonoSingleton` architectures w
 5. Paste the following URL:
 
 ```
-https://github.com/FriedCrumpets/Buttr.git?path=Assets/Plugins/Buttr
+https://github.com/FriedCrumpets/Buttr.git?path=Assets/Plugins/Buttr#main
 ```
 
 ### Releases
