@@ -29,7 +29,7 @@ namespace Buttr.Editor.Scaffolding {
 
             // ── Package root files (no command equivalent) ───────────
             root.WriteFile($"{packageName}Package.cs",
-                new ButtrPackageExtensionTemplate(ns, packageName, type).Generate());
+                new ButtrPackageExtensionTemplate(ns, projectName, type).Generate());
 
             root.WriteFile($"{ns}.asmdef",
                 new ButtrAsmdefTemplate(ns).Generate());

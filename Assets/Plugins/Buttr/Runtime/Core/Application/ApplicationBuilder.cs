@@ -14,15 +14,15 @@ namespace Buttr.Core {
             set { m_Cleanup = value; }
         }
         
-        public ApplicationLifetime Build() {
+        public ApplicationContainer Build() {
             m_Hidden.Resolve();
             m_Resolvers.Resolve();
             
             var cleanup = m_Cleanup is not null
-                ? new DisposableCollection(new IDisposable[] { m_Cleanup, m_Resolvers, m_Hidden, new Disposable(ScopeRegistry.Clear) })
-                : new DisposableCollection(new IDisposable[] { m_Resolvers, m_Hidden, new Disposable(ScopeRegistry.Clear) });
+                ? new DisposableCollection(new IDisposable[] { m_Cleanup, m_Resolvers, m_Hidden })
+                : new DisposableCollection(new IDisposable[] { m_Resolvers, m_Hidden });
 
-            return new ApplicationLifetime(cleanup);
+            return new ApplicationContainer(cleanup);
         }
     }
 }
