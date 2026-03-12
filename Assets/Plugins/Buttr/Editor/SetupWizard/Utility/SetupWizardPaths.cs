@@ -34,18 +34,15 @@ namespace Buttr.Editor.SetupWizard
 
         /// <summary>Path to SetupWizard.uxml</summary>
         internal static string SetupWizardUxml
-            // => $"{PackageRoot}/Editor/SetupWizard/UXML/SetupWizard.uxml";
-            => $"Assets/Plugins/Buttr/Editor/SetupWizard/UXML/SetupWizard.uxml";
+            => $"{PackageRoot}/Editor/SetupWizard/UXML/SetupWizard.uxml";
 
         /// <summary>Path to FolderItem.uxml</summary>
         internal static string FolderItemUxml
-            // => $"{PackageRoot}/Editor/SetupWizard/UXML/FolderItem.uxml";
-            => $"Assets/Plugins/Buttr/Editor/SetupWizard/UXML/FolderItem.uxml";
+            => $"{PackageRoot}/Editor/SetupWizard/UXML/FolderItem.uxml";
 
         /// <summary>Path to Theme.uss</summary>
         internal static string ThemeUss
-            // => $"{PackageRoot}/Editor/SetupWizard/USS/Theme.uss";
-            => $"Assets/Plugins/Buttr/Editor/SetupWizard/USS/Theme.uss";
+            => $"{PackageRoot}/Editor/SetupWizard/USS/Theme.uss";
 
         // ── Resolution ───────────────────────────────────────────────
 
@@ -80,7 +77,7 @@ namespace Buttr.Editor.SetupWizard
                 "[Buttr] Could not resolve package root. " +
                 "Falling back to Assets/Plugins/Buttr.");
 
-            return "Assets/Plugins/Buttr";
+            return "Packages/Buttr";
         }
     }
 }
