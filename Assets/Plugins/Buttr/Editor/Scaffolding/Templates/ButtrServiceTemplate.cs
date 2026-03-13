@@ -11,10 +11,10 @@ namespace Buttr.Editor.Scaffolding {
         public string Generate() {
             return $@"namespace {m_Ns} {{
     public sealed class {m_Name}Service : I{m_Name}Service {{
-        private readonly {m_Name}Model m_Model;
+        private readonly {m_Name}Presenter m_Presenter;
 
-        public {m_Name}Service({m_Name}Model model) {{
-            m_Model = model;
+        public {m_Name}Service({m_Name}Presenter presenter) {{
+            m_Presenter = presenter;
         }}
     }}
 }}

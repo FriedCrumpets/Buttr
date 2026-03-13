@@ -14,12 +14,17 @@ namespace Buttr.Editor.Scaffolding {
 namespace {m_Ns} {{
     public sealed class {m_Name}Mediator : IDisposable {{
         private readonly {m_Name}Presenter m_Presenter;
+        private readonly {m_Name}Model m_Model;
 
-        public {m_Name}Mediator({m_Name}Presenter presenter) {{
+        public {m_Name}Mediator({m_Name}Presenter presenter, {m_Name}Model model) {{
+            // todo: subscribe to model changes
+
             m_Presenter = presenter;
+            m_Model = model;
         }}
 
         public void Dispose() {{
+            // todo: unsubscribe from model changes
         }}
     }}
 }}

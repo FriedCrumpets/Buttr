@@ -10,9 +10,13 @@ namespace Buttr.Editor.Scaffolding {
 
         public string Generate() {
             return $@"using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace {m_Ns} {{
-    public sealed class {m_Name}View : MonoBehaviour {{
+    public sealed class {m_Name}View {{
+        public {m_Name}View(UIDocument document){{
+
+        }}
     }}
 }}
 ";

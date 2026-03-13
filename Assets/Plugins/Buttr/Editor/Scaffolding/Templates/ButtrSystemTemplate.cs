@@ -18,8 +18,7 @@ namespace Buttr.Editor.Scaffolding {
             set => m_ActiveBehaviour = value;
         }}
 
-        public void Tick({m_Name}Context ctx) {{
-        }}
+        public void Tick({m_Name}Context ctx) {{ }}
     }}
 }}
 ";

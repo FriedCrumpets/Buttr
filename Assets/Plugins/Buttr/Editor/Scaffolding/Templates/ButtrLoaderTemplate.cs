@@ -29,8 +29,9 @@ namespace {m_Ns} {{
         public override Awaitable LoadAsync(CancellationToken cancellationToken) {{
             var builder = new ScopeBuilder({m_Name}Package.Scope);
 
-            builder.Use{m_Name}();
             m_Injector.Inject(builder);
+
+            builder.Use{m_Name}();
 
             m_Container = builder.Build();
             return AwaitableUtility.CompletedTask;
@@ -51,17 +52,25 @@ using UnityEngine;
 namespace {m_Ns} {{
     [CreateAssetMenu(fileName = ""{m_Name}Loader"", menuName = ""{m_ProjectName}/Loaders/{m_Name}"", order = 0)]
     public sealed class {m_Name}Loader : UnityApplicationLoaderBase {{
-        private ApplicationLifetime m_Lifetime;
+        [Header(""Scriptable Objects"")]
+        [SerializeField] private ScriptableInjector m_Injector;
+
+        private ApplicationContainer m_Container;
 
         public override Awaitable LoadAsync(CancellationToken cancellationToken) {{
             var builder = new ApplicationBuilder();
+
+            m_Injector.Inject(builder);
+
             builder.Use{m_Name}();
-            m_Lifetime = builder.Build();
+
+            m_Container = builder.Build();
+
             return AwaitableUtility.CompletedTask;
         }}
 
         public override Awaitable UnloadAsync() {{
-            m_Lifetime?.Dispose();
+            m_Container?.Dispose();
             return AwaitableUtility.CompletedTask;
         }}
     }}
@@ -71,4 +80,5 @@ namespace {m_Ns} {{
             };
         }
     }
+
 }

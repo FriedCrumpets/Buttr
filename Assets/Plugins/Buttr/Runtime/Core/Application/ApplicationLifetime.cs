@@ -1,10 +1,10 @@
 using System;
 
 namespace Buttr.Core {
-    public sealed class ApplicationLifetime : IDisposable {
+    public sealed class ApplicationContainer : IDisposable {
         private readonly IDisposable m_Cleanup;
         
-        public ApplicationLifetime(IDisposable cleanup) {
+        public ApplicationContainer(IDisposable cleanup) {
             m_Cleanup = cleanup;
         }
         

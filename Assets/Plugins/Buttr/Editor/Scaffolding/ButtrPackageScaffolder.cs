@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
@@ -42,10 +43,24 @@ namespace Buttr.Editor.Scaffolding {
             new AddPresenterCommand(root, false).Execute();
             new AddMediatorCommand(root, false).Execute();
             new AddServiceAndContractCommand(root, false).Execute();
-            new AddViewCommand(root, false).Execute();
-            new AddLoaderCommand(root, type, false).Execute();
+
+            switch (type) {
+                case PackageType.Feature:
+                case PackageType.Core:
+                    new AddLoaderCommand(root, type, false).Execute();
+                    break;
+                case PackageType.UI:
+                    new AddViewCommand(root, false).Execute();
+                    new AddInstanceCommand(root, type, false).Execute();
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            }
 
             // ── Optional additions via commands ──────────────────────
+            if(options.HasFlag(PackageOptions.Definitions))
+                new AddDefinitionCommand(root, false).Execute();
+            
             if (options.HasFlag(PackageOptions.Handlers))
                 new AddHandlerCommand(root, false).Execute();
 
@@ -54,6 +69,9 @@ namespace Buttr.Editor.Scaffolding {
 
             if (options.HasFlag(PackageOptions.Identifiers))
                 new AddIdentifierCommand(root, false).Execute();
+            
+            if(options.HasFlag(PackageOptions.Controller))
+                new AddControllerCommand(root, false).Execute();
 
             if (options.HasFlag(PackageOptions.Configurations))
                 new AddConfigurationCommand(root, false).Execute();

@@ -10,5 +10,7 @@ namespace Buttr.Editor.Scaffolding {
         Configurations = 1 << 3,
         Common         = 1 << 4,
         Exceptions     = 1 << 5,
+        Definitions    = 1 << 6,
+        Controller    = 1 << 7,
     }
 }

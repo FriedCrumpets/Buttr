@@ -10,8 +10,7 @@ namespace Buttr.Editor.Scaffolding {
 
         public string Generate() {
             return $@"namespace {m_Ns} {{
-    internal static class {m_Name}Extensions {{
-    }}
+    internal static class {m_Name}Extensions {{ }}
 }}
 ";
         }

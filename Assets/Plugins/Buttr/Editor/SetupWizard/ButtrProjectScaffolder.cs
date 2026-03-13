@@ -162,9 +162,9 @@ using Buttr.Core;
 
 namespace {sanitisedName} {{
     public static class Program {{
-        public static ApplicationLifetime Main() => Main(CMDArgs.Read());
+        public static ApplicationContainer Main() => Main(CMDArgs.Read());
 
-        private static ApplicationLifetime Main(IDictionary<string, string> args) {{
+        private static ApplicationContainer Main(IDictionary<string, string> args) {{
             var builder = new ApplicationBuilder();
 
             // Register your packages here:
@@ -197,15 +197,15 @@ using UnityEngine;
 namespace {sanitisedName} {{
     [CreateAssetMenu(fileName = ""ProgramLoader"", menuName = ""Buttr/Loaders/Program"", order = 0)]
     public sealed class ProgramLoader : UnityApplicationLoaderBase {{
-        private ApplicationLifetime m_Lifetime;
+        private ApplicationContainer m_Container;
 
         public override Awaitable LoadAsync(CancellationToken cancellationToken) {{
-            m_Lifetime = Program.Main();
+            m_Container = Program.Main();
             return AwaitableUtility.CompletedTask;
         }}
 
         public override Awaitable UnloadAsync() {{
-            m_Lifetime?.Dispose();
+            m_Container?.Dispose();
             return AwaitableUtility.CompletedTask;
         }}
     }}

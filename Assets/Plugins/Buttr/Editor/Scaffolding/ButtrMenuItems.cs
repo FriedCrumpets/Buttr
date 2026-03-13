@@ -23,7 +23,7 @@ namespace Buttr.Editor.Scaffolding {
             return ButtrMenuItemsUtility.HasConventionStructure();
         }
 
-        [MenuItem("Assets/Buttr/Packages/New Core Package", false, BasePriority + 1)]
+        [MenuItem("Assets/Buttr/Packages/New Core", false, BasePriority + 1)]
         private static void NewCorePackage() {
             var parent = ButtrMenuItemsUtility.GetSelectedFolder();
             var coreFolder = Path.Combine(Application.dataPath, "_Project", "Core");
@@ -35,8 +35,25 @@ namespace Buttr.Editor.Scaffolding {
             Debug.Log("[Buttr] New Core Package popup — wire ButtrNewPackagePopup.Show() here");
         }
 
-        [MenuItem("Assets/Buttr/Packages/New Core Package", true)]
+        [MenuItem("Assets/Buttr/Packages/New Core", true)]
         private static bool NewCorePackageValidation() {
+            return ButtrMenuItemsUtility.HasConventionStructure();
+        }
+        
+        [MenuItem("Assets/Buttr/Packages/New UI", false, BasePriority + 1)]
+        private static void NewUIPackage() {
+            var parent = ButtrMenuItemsUtility.GetSelectedFolder();
+            var coreFolder = Path.Combine(Application.dataPath, "_Project", "UI");
+
+            if (false == parent.Replace('\\', '/').Contains("/UI"))
+                parent = coreFolder;
+
+            ButtrNewPackagePopup.Show(parent, PackageType.UI);
+            Debug.Log("[Buttr] New UI Package popup — wire ButtrNewPackagePopup.Show() here");
+        }
+
+        [MenuItem("Assets/Buttr/Packages/New UI", true)]
+        private static bool NewUIPackageValidation() {
             return ButtrMenuItemsUtility.HasConventionStructure();
         }
 

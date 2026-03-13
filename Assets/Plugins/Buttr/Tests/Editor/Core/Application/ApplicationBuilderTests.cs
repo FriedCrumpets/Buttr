@@ -12,7 +12,7 @@ namespace Buttr.Tests.Editor.Application {
         }
 
         private ApplicationBuilder m_Builder;
-        private ApplicationLifetime m_Lifetime;
+        private ApplicationContainer m_Container;
         
         [SetUp]
         public void SetUp() {
@@ -21,7 +21,7 @@ namespace Buttr.Tests.Editor.Application {
 
         [TearDown]
         public void TearDown() {
-            m_Lifetime?.Dispose();   
+            m_Container?.Dispose();   
         }
         
         [Test] public void Build_DoesNotThrow() {
@@ -31,13 +31,13 @@ namespace Buttr.Tests.Editor.Application {
         [Test] public void Build_ResolvesHiddenCollection() {
             m_Builder.Hidden.AddSingleton<Hidden>();
             m_Builder.Resolvers.AddSingleton<IAbstract, ConcreteReliesOnHidden>();
-            m_Lifetime = m_Builder.Build();
+            m_Container = m_Builder.Build();
             Assert.DoesNotThrow(() => Application<IAbstract>.Get());
         }
         
         [Test] public void Build_ResolvesResolverCollection() { 
             m_Builder.Resolvers.AddSingleton<IAbstract, Concrete>();
-            m_Lifetime = m_Builder.Build();
+            m_Container = m_Builder.Build();
             Assert.DoesNotThrow(() => Application<IAbstract>.Get());
         }
 
@@ -52,8 +52,8 @@ namespace Buttr.Tests.Editor.Application {
         [Test] public void IfCleanupProvided_CleanupIsAddedToApplicationRunner() {
             var disposed = new Disposable();
             m_Builder.Cleanup = new DisposableCollection(disposed);
-            m_Lifetime = m_Builder.Build();
-            m_Lifetime.Dispose();
+            m_Container = m_Builder.Build();
+            m_Container.Dispose();
             
             Assert.IsTrue(disposed.Disposed == true);
         }

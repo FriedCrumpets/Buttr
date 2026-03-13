@@ -10,8 +10,7 @@ namespace Buttr.Editor.Scaffolding {
 
         public string Generate() {
             return $@"namespace {m_Ns} {{
-    public sealed class {m_Name}Model {{
-    }}
+    public sealed class {m_Name}Model {{ }}
 }}
 ";
         }

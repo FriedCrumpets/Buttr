@@ -3,7 +3,7 @@
     <ui:VisualElement name="CoreWindow" style="flex-grow: 0; position: absolute; flex-shrink: 0; width: 520px; height: 580px; align-items: center; justify-content: space-between; align-self: center; align-content: center;">
         <ui:VisualElement name="Logo__Section" class="buttr-logo-section" style="position: relative;">
             <ui:VisualElement name="Logo__Section--background" style="flex-grow: 0; position: absolute; width: 520px; height: 100px; background-color: rgb(38, 34, 33);" />
-            <ui:VisualElement name="Logo__Image" class="buttr-logo" />
+            <ui:VisualElement name="Logo__Image" class="buttr-logo" style="background-image: url(&quot;project://database/Assets/Plugins/Buttr/Editor/SetupWizard/Images/Logo-simple.svg?fileID=7388822144124034973&amp;guid=4635133cb527a0f40ab117dd328f31c8&amp;type=3#Logo-simple&quot;);" />
         </ui:VisualElement>
         <ui:VisualElement name="Footer" style="flex-grow: 0; width: 520px; height: 80px; background-color: rgb(55, 55, 55); white-space: normal; flex-direction: row; align-items: center; justify-content: space-between; align-self: center; position: relative;">
             <ui:Button text="Skip" name="Footer__LeftButton" double-click-selects-word="false" triple-click-selects-line="true" display-tooltip-when-elided="false" style="display: flex; background-color: rgba(188, 188, 188, 0); border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; color: rgb(233, 233, 233); -unity-font-style: bold; margin-left: 24px;" />

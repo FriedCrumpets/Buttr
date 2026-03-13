@@ -42,6 +42,23 @@ namespace {m_Ns} {{
     }}
 }}
 ",
+                PackageType.UI => $@"using Buttr.Core;
+
+namespace {m_Ns} {{
+    public static class {m_Name}Package {{
+        public const string Scope = ""{m_Name.ToLowerInvariant()}"";
+
+        public static IConfigurableCollection Use{m_Name}(this ScopeBuilder builder) {{
+            return new ConfigurableCollection()
+                .Register(builder.Resolvers.AddSingleton<I{m_Name}Service, {m_Name}Service>())
+                .Register(builder.Resolvers.AddSingleton<{m_Name}Model>())
+                .Register(builder.Resolvers.AddSingleton<{m_Name}Presenter>())
+                .Register(builder.Resolvers.AddSingleton<{m_Name}View>())
+                .Register(builder.Resolvers.AddSingleton<{m_Name}Mediator>());
+        }}
+    }}
+}}
+",
                 _ => string.Empty
             };
         }

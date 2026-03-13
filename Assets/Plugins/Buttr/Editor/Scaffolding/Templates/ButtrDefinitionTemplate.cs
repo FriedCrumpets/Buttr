@@ -15,8 +15,7 @@ namespace Buttr.Editor.Scaffolding {
 
 namespace {m_Ns} {{
     [CreateAssetMenu(fileName = ""New{m_Name}Definition"", menuName = ""{m_ProjectName}/Definitions/{m_Name}"", order = 0)]
-    public class {m_Name}Definition : ScriptableObject {{
-    }}
+    public class {m_Name}Definition : ScriptableObject {{ }}
 }}
 ";
         }

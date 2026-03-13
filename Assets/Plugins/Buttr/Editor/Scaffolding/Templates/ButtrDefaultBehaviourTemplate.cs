@@ -11,8 +11,7 @@ namespace Buttr.Editor.Scaffolding {
         public string Generate() {
             return $@"namespace {m_Ns} {{
     public sealed class Default{m_Name}Behaviour : I{m_Name}Behaviour {{
-        public void Tick({m_Name}Context ctx) {{
-        }}
+        public void Tick({m_Name}Context ctx) {{ }}
     }}
 }}
 ";

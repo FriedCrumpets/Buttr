@@ -22,4 +22,23 @@ namespace Buttr.Editor.Scaffolding {
             $"{name}Loader".QueuePendingAsset($"Assets/{relative}/Loaders/{name}Loader.asset");
         }
     }
+    
+    internal readonly ref struct AddInstanceCommand {
+        private readonly string m_PackageFolder;
+        private readonly PackageType m_Type;
+        private readonly bool m_RefreshAssetDatabase;
+
+        public AddInstanceCommand(string packageFolder, PackageType type, bool refreshAssetDatabase) {
+            m_PackageFolder = packageFolder;
+            m_Type = type;
+            m_RefreshAssetDatabase = refreshAssetDatabase;
+        }
+
+        public void Execute() {
+            var (ns, name) = m_PackageFolder.InferPackage();
+            var projectName = ButtrPackageScaffolderUtility.GetRootNamespace();
+            var folder = m_PackageFolder.EnsureSubFolder("MonoBehaviours");
+            folder.WriteFileIfNew($"{name}Instance.cs", new ButtrInstanceTemplate(projectName, ns, name, m_Type).Generate(), m_RefreshAssetDatabase);
+        }
+    }
 }

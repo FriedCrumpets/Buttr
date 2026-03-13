@@ -1,5 +1,5 @@
 namespace Buttr.Core {
     public interface IContainerBuilder {
-        public ApplicationLifetime Build();
+        public ApplicationContainer Build();
     }
 }

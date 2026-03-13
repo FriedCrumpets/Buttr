@@ -1,7 +1,7 @@
 using UnityEngine;
 
 namespace Buttr.Injection {
-    [ DefaultExecutionOrder(-10000) ]
+    [ DefaultExecutionOrder(-9000) ]
     internal sealed class SceneInjector : MonoBehaviour {
         private void Awake() {
             InjectionProcessor.InjectScene(gameObject.scene);

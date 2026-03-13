@@ -10,8 +10,8 @@ namespace Buttr.Editor.Scaffolding {
 
         public void Execute() {
             var (ns, name) = m_PackageFolder.InferPackage();
-            var folder = m_PackageFolder.EnsureSubFolder("MonoBehaviours");
-            folder.WriteFileIfNew($"{name}View.cs", new ButtrViewTemplate(ns, name).Generate());
+            var folder = m_PackageFolder.EnsureSubFolder("Components");
+            folder.WriteFileIfNew($"{name}View.cs", new ButtrViewTemplate(ns, name).Generate(), m_RefreshAssetDatabase);
         }
     }
 }

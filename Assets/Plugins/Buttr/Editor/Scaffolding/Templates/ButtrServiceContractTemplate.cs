@@ -10,8 +10,7 @@ namespace Buttr.Editor.Scaffolding {
 
         public string Generate() {
             return $@"namespace {m_Ns} {{
-    public interface I{m_Name}Service {{
-    }}
+    public interface I{m_Name}Service {{ }}
 }}
 ";
         }
