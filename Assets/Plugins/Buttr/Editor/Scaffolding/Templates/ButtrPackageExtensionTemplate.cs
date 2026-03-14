@@ -20,10 +20,10 @@ namespace {m_Ns} {{
 
         public static IConfigurableCollection Use{m_Name}(this ScopeBuilder builder) {{
             return new ConfigurableCollection()
-                .Register(builder.AddSingleton<I{m_Name}Service, {m_Name}Service>())
-                .Register(builder.AddSingleton<{m_Name}Model>())
-                .Register(builder.AddSingleton<{m_Name}Presenter>())
-                .Register(builder.AddSingleton<{m_Name}Mediator>());
+                .Register(builder.Resolvers.AddSingleton<I{m_Name}Service, {m_Name}Service>())
+                .Register(builder.Resolvers.AddSingleton<{m_Name}Model>())
+                .Register(builder.Resolvers.AddSingleton<{m_Name}Presenter>())
+                .Register(builder.Resolvers.AddSingleton<{m_Name}Mediator>());
         }}
     }}
 }}

@@ -12,22 +12,23 @@ namespace Buttr.Editor.Scaffolding {
         public static string ResolveNamespace(this string parentFolder, string packageName) {
             var dataPath = Application.dataPath;
             var projectFolder = Path.Combine(dataPath, "_Project");
-            projectFolder = projectFolder.Replace('/', '\\');
-            
+    
+            projectFolder = projectFolder.Replace('\\', '/');
+            parentFolder = parentFolder.Replace('\\', '/');
+    
             if (false == parentFolder.StartsWith(projectFolder)) {
                 return packageName;
             }
 
             var relative = parentFolder[projectFolder.Length..]
-                .TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+                .TrimStart('/', '\\');
 
             var rootNs = GetRootNamespace();
 
             if (string.IsNullOrEmpty(relative))
                 return $"{rootNs}.{packageName}";
 
-            var middle = relative.Replace(Path.DirectorySeparatorChar, '.')
-                .Replace(Path.AltDirectorySeparatorChar, '.');
+            var middle = relative.Replace('/', '.').Replace('\\', '.');
 
             return $"{rootNs}.{middle}.{packageName}";
         }

@@ -39,6 +39,13 @@ namespace Buttr.Editor.Scaffolding {
         }
 
         private static void CreatePendingAsset(string typeName, string assetPath) {
+            // Normalising to Assets-relative path immediately
+            assetPath = assetPath.Replace('\\', '/');
+    
+            if (assetPath.Contains(Application.dataPath.Replace('\\', '/'))) {
+                assetPath = "Assets" + assetPath.Substring(Application.dataPath.Replace('\\', '/').Length);
+            }
+    
             if (AssetDatabase.LoadAssetAtPath<ScriptableObject>(assetPath) != null) {
                 Debug.Log($"[Buttr] {Path.GetFileName(assetPath)} already exists — skipping");
                 return;
@@ -57,22 +64,15 @@ namespace Buttr.Editor.Scaffolding {
                 return;
             }
 
-            var directory = Path.GetDirectoryName(assetPath);
-            directory = directory?.Replace('\\', '/');
-            
-            if (false == string.IsNullOrEmpty(directory) && false == Directory.Exists(directory))
-                Directory.CreateDirectory(directory);
+            // Using absolute path for filesystem operations
+            var absoluteDir = Path.Combine(Application.dataPath, assetPath.Substring("Assets/".Length));
+            absoluteDir = Path.GetDirectoryName(absoluteDir)?.Replace('\\', '/');
+    
+            if (false == string.IsNullOrEmpty(absoluteDir) && false == Directory.Exists(absoluteDir))
+                Directory.CreateDirectory(absoluteDir);
 
             var instance = ScriptableObject.CreateInstance(targetType);
-            
-            // Normalise to Assets-relative path with forward slashes
-            if (assetPath.Contains(Application.dataPath)) {
-                assetPath = "Assets" + assetPath.Substring(Application.dataPath.Length);
-            }
-
-            assetPath = assetPath.Replace('\\', '/');
-            
-            AssetDatabase.CreateAsset(instance, assetPath); // error throws here
+            AssetDatabase.CreateAsset(instance, assetPath);
             AssetDatabase.SaveAssets();
 
             Debug.Log($"[Buttr] Created {Path.GetFileName(assetPath)}");
