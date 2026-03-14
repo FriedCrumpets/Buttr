@@ -1,6 +1,6 @@
 {
   "name": "com.crumpetlabs.buttr",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "displayName": "Buttr",
   "description": "A lightweight DI framework, built for Unity",
   "unity": "6000.0",

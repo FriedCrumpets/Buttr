@@ -4,6 +4,13 @@ All notable changes to Buttr will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.1] - 2026-03-14
+
+### Fixed
+
+- **Warnings relating to uxml on install** removed unecessary uxml from the project and updated the asset paths relative
+- **Project name scaffolding** some projects have weird names. So now we protect against that inside the scaffolding logic
+
 ## [2.1.0] - 2026-03-14
 
 ### Added
