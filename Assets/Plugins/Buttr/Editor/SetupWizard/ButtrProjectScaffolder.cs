@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Buttr.Editor.Scaffolding;
 using Buttr.Unity;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -30,7 +31,7 @@ namespace Buttr.Editor.SetupWizard {
         private readonly string m_ButtrVersion;
 
         internal ButtrProjectScaffolder(string projectName, string buttrVersion) {
-            m_ProjectName = projectName;
+            m_ProjectName = ButtrPackageScaffolderUtility.SanitiseTypeName(projectName);
             m_ButtrVersion = buttrVersion;
         }
 
