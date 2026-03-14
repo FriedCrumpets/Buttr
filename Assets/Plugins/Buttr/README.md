@@ -54,12 +54,13 @@ It takes a bit of adjustment, but it's worth it.
 | Layer | Suffix | What it does | Type |
 |-------|--------|-------------|------|
 | **Unity** | Controller | Coordinates Unity components and systems on a GameObject | MonoBehaviour |
-| | View | Displays Model data on a GameObject — reads only | MonoBehaviour |
+| | Instance | Manages a scoped container's lifecycle on a GameObject (e.g. UI panels) | MonoBehaviour |
 | **Data** | Model | Data — no behaviour, no dependencies | Class / Struct |
 | | Id | Readonly struct for domain-driven identity | Struct |
 | | Definition | ScriptableObject entry point into a feature | ScriptableObject |
 | | Configuration | ScriptableObject providing editable settings | ScriptableObject |
-| **Logic** | Presenter | Explicit operations on Models — the only type that mutates state | Class |
+| **Logic** | View | Observes and displays Model data — reads only | Class |
+| | Presenter | Explicit operations on Models — the only type that mutates state | Class |
 | | System | Reads Model state and executes it continuously | Class |
 | | Mediator | Listens to events, filters and routes towards Presenters | Class |
 | | Handler | Stateless ScriptableObject — designer-facing, editor-swappable logic | ScriptableObject |
@@ -79,7 +80,7 @@ These are the types that touch GameObjects and live in Unity's lifecycle. All Mo
 
 **Controllers** coordinate Unity components, injected services, and event systems on a GameObject. They manage lifecycle (`OnEnable`, `OnDisable`), own subscriptions, and expose a public API for other systems to interact with. Controllers are always MonoBehaviours. Controllers do not mutate feature-level Model state directly — they route actions to Presenters or raise events that Mediators handle.
 
-**Views** observe and display Model data but never write to it. They render UI, update visual state, and respond to Model changes — but all mutations flow back through a Presenter.
+**Instances** are MonoBehaviours that own a scoped container's lifecycle on a GameObject. They build a `ScopeBuilder`, inject ScriptableObjects via `ScriptableInjector`, register the feature's package, and dispose the container on `OnDestroy`. Instances are used when a feature needs its own isolated scope tied to a specific GameObject — most commonly for UI panels backed by UI Toolkit. The naming of this convention is subject to change in a future version.
 
 ---
 
@@ -100,6 +101,18 @@ These types hold or describe data. They have no behaviour, no dependencies, and 
 ### Logic Layer
 
 These types make decisions. They contain the rules, strategies, and coordination logic that drive your features.
+
+**Views** observe and display Model data but never write to it. They are plain C# classes that receive their dependencies via constructor injection. For UI Toolkit features, a View takes a `UIDocument` reference and queries visual elements from it. All mutations flow back through a Presenter — Views never write to the Model.
+
+```csharp
+public sealed class InventoryView {
+    private readonly VisualElement m_Root;
+
+    public InventoryView(UIDocument document) {
+        m_Root = document.rootVisualElement;
+    }
+}
+```
 
 **Presenters** are plain C# classes that perform explicit operations on Models — they are the only type that should mutate Model state. They receive dependencies via constructor injection and live in `Components/` alongside other injected types.
 
@@ -135,26 +148,24 @@ public sealed class MovementSystem {
 
 **Mediators** are self-contained event listeners. They bind to events in their constructor, apply filtering or transformation logic, and route results to the relevant Presenter — or exit early if the event isn't applicable. Nothing calls into a Mediator from the outside; they react to events implicitly. Mediators unbind from events on disposal. They are injectable plain C# classes that live in `Components/`, and they use standard C# events or event buses — not UnityEvents.
 
+The standard Mediator pattern takes a Presenter, Model, and View — observing Model changes and updating the View accordingly. What gets injected depends on the feature's needs; there's no enforced rule beyond the convention that Mediators react to changes rather than being called into directly.
+
 ```csharp
-public sealed class DamageMediator : IDisposable {
-    private readonly HealthPresenter m_Presenter;
-    private readonly IDamageEventBus m_EventBus;
+public sealed class InventoryMediator : IDisposable {
+    private readonly InventoryPresenter m_Presenter;
+    private readonly InventoryModel m_Model;
+    private readonly InventoryView m_View;
 
-    public DamageMediator(HealthPresenter presenter, IDamageEventBus eventBus) {
+    public InventoryMediator(InventoryPresenter presenter, InventoryModel model, InventoryView view) {
         m_Presenter = presenter;
-        m_EventBus = eventBus;
+        m_Model = model;
+        m_View = view;
 
-        m_EventBus.OnDamageDealt += HandleDamage;
-    }
-
-    private void HandleDamage(DamageEvent evt) {
-        if (!evt.Target.IsAlive) return;
-        var mitigated = evt.Amount * evt.Target.Resistance;
-        m_Presenter.ApplyDamage(evt.Target, mitigated);
+        // Subscribe to model changes, update view accordingly
     }
 
     public void Dispose() {
-        m_EventBus.OnDamageDealt -= HandleDamage;
+        // Unsubscribe from model changes
     }
 }
 ```
@@ -209,7 +220,7 @@ public sealed class StatsService : IStatsService {
 
 **Repositories** are interfaces that define CRUD operations on local persistent storage. They own the persistence boundary and expose domain-friendly methods rather than raw storage calls. The pattern is the same regardless of storage engine; only the implementation changes. Repository contracts live in `Contracts/` alongside Service contracts.
 
-**Registries** are the runtime counterpart to Repositories. Where a Repository persists data to storage, a Registry tracks what's alive and accessible right now — active entities, spawned objects, loaded resources — typically keyed by their ID. Registration returns a disposable handle for automatic deregistration on disposal.
+**Registries** are the runtime counterpart to Repositories. Where a Repository persists data to storage, a Registry tracks what's alive and accessible right now — active entities, spawned objects, loaded resources — typically keyed by `EntityId`. Registration returns a disposable handle for automatic deregistration on disposal.
 
 **Loaders** are `UnityApplicationLoaderBase` ScriptableObjects that bootstrap a feature at boot time. They register dependencies, initialise systems, and wire up the feature's package. Loaders are the bridge between the boot pipeline and your feature's DI configuration. The script lives in a `Loaders/` folder within the feature; the asset also lives in the package's `Loaders/` folder.
 
@@ -248,7 +259,8 @@ Features/
     ├── README.md                   # Feature documentation — optional
     ├── Components/                 # Injected types: Presenters, Models,
     │   ├── ConsolePresenter.cs     #   Services, Repositories, Registries,
-    │   ├── ConsoleModel.cs         #   Mediators, Systems
+    │   ├── ConsoleModel.cs         #   Mediators, Systems, Views
+    │   ├── ConsoleView.cs
     │   └── ConsoleMediator.cs
     ├── Configurations/             # Configuration ScriptableObject scripts
     │   └── ConsoleConfiguration.cs
@@ -257,7 +269,7 @@ Features/
     ├── Identifiers/                # Readonly ID structs
     │   └── ConsoleLogId.cs
     ├── MonoBehaviours/             # ALL MonoBehaviours for this feature
-    │   └── ConsoleView.cs
+    │   └── ConsoleController.cs
     ├── Common/                     # Supporting types that don't fit elsewhere
     │   ├── ConsoleLog.cs
     │   └── ConsoleCategory.cs
@@ -279,13 +291,13 @@ Features/
     ├── Components/
     │   ├── CombatPresenter.cs
     │   ├── CombatModel.cs
+    │   ├── CombatView.cs
     │   ├── CombatSystem.cs
     │   ├── DamageMediator.cs
     │   ├── StatsService.cs
     │   └── CombatRegistry.cs
     ├── Contracts/
-    │   ├── IStatsService.cs
-    │   └── ICombatView.cs
+    │   └── IStatsService.cs
     ├── Identifiers/
     │   ├── CombatantId.cs
     │   └── AbilityId.cs
@@ -297,7 +309,7 @@ Features/
     │   └── DefensiveBehaviour.cs
     ├── MonoBehaviours/
     │   ├── CombatAnimationController.cs
-    │   └── CombatView.cs
+    │   └── CombatInstance.cs
     ├── Common/
     │   ├── DamageEvent.cs
     │   ├── CombatContext.cs
@@ -305,6 +317,28 @@ Features/
     └── Loaders/
         ├── CombatLoader.cs
         └── CombatLoader.asset
+```
+
+A UI feature using UI Toolkit:
+
+```
+Features/
+└── Inventory/
+    ├── InventoryPackage.cs
+    ├── {Namespace}.asmdef
+    ├── README.md
+    ├── Components/
+    │   ├── InventoryPresenter.cs
+    │   ├── InventoryModel.cs
+    │   ├── InventoryView.cs
+    │   ├── InventoryMediator.cs
+    │   └── InventoryService.cs
+    ├── Contracts/
+    │   └── IInventoryService.cs
+    ├── MonoBehaviours/
+    │   └── InventoryInstance.cs
+    └── Common/
+        └── InventorySlot.cs
 ```
 
 The `Catalog/` folder mirrors the feature structure for ScriptableObject data assets (Configurations, Definitions, and Handlers). Loader assets are the exception — they live in the package's `Loaders/` folder:
@@ -340,13 +374,15 @@ Buttr provides right-click context menus in the Project window to scaffold packa
 
 ### Create Package
 
-**New Feature** and **New Core Package** prompt for a name and scaffold the full package structure — the package entry point, assembly definition, Components folder with a Model, Presenter, Mediator, and Service, Contracts folder with the service interface, MonoBehaviours folder with a View, and a Loader. All classes are correctly named, sealed, and wired with constructor injection. Optional additions (Handlers, Behaviours, Identifiers, Configurations, Common, Exceptions) can be selected during creation.
+**New Feature**, **New Core Package**, and **New UI Package** prompt for a name and scaffold the full package structure — the package entry point, assembly definition, Components folder with a Model, Presenter, Mediator, View, and Service, Contracts folder with the service interface, and a Loader (or Instance for UI packages). All classes are correctly named, sealed, and wired with constructor injection. Optional additions (Handlers, Behaviours, Identifiers, Configurations, Common, Exceptions) can be selected during creation.
+
+UI packages scaffold a `{Name}Instance` MonoBehaviour that owns a `ScopeBuilder` and `UIDocument` reference, and a `{Name}View` class that takes the `UIDocument` for querying visual elements.
 
 ### Add to Package
 
 **Add to Package** lets you add individual types to an existing package. It infers the package name from the folder you right-click in, creates the appropriate subfolder if it doesn't exist, and drops in a correctly templated file. Types are grouped by their architectural layer:
 
-- **Unity** — Controller, View
+- **Unity** — Controller, View, Instance
 - **Data** — Model, Identifier, Definition, Configuration
 - **Logic** — Presenter, System, Mediator, Handler, Behaviour
 - **Infrastructure** — Service + Contract (scaffolds both together), Repository, Registry, Loader
@@ -366,9 +402,9 @@ Buttr also provides `CMDArgs`, a static utility that parses command line argumen
 
 ```csharp
 public static class Program {
-    public static ApplicationLifetime Main() => Main(CMDArgs.Read());
+    public static ApplicationContainer Main() => Main(CMDArgs.Read());
 
-    private static ApplicationLifetime Main(IDictionary<string, string> args) {
+    private static ApplicationContainer Main(IDictionary<string, string> args) {
         var builder = new ApplicationBuilder();
 
         builder.UseConsole();
@@ -380,20 +416,20 @@ public static class Program {
 }
 ```
 
-The wizard also generates a `ProgramLoader` — a thin `UnityApplicationLoaderBase` that calls `Program.Main()` and manages the lifetime:
+The wizard also generates a `ProgramLoader` — a thin `UnityApplicationLoaderBase` that calls `Program.Main()` and manages the container:
 
 ```csharp
 [CreateAssetMenu(fileName = "ProgramLoader", menuName = "Buttr/Loaders/Program", order = 0)]
 public sealed class ProgramLoader : UnityApplicationLoaderBase {
-    private ApplicationLifetime m_Lifetime;
+    private ApplicationContainer m_Container;
 
     public override Awaitable LoadAsync(CancellationToken cancellationToken) {
-        m_Lifetime = Program.Main();
+        m_Container = Program.Main();
         return AwaitableUtility.CompletedTask;
     }
 
     public override Awaitable UnloadAsync() {
-        m_Lifetime?.Dispose();
+        m_Container?.Dispose();
         return AwaitableUtility.CompletedTask;
     }
 }
@@ -407,19 +443,19 @@ For features that need their own boot-time setup beyond the main `Program.cs`, c
 
 ```csharp
 public sealed class SceneLoader : UnityApplicationLoaderBase {
-    private ApplicationLifetime m_Lifetime;
+    private ApplicationContainer m_Container;
 
     public override Awaitable LoadAsync(CancellationToken cancellationToken) {
         var builder = new ApplicationBuilder();
 
         builder.Resolvers.AddSingleton<ISceneService, SceneService>();
 
-        m_Lifetime = builder.Build();
+        m_Container = builder.Build();
         return AwaitableUtility.CompletedTask;
     }
 
     public override Awaitable UnloadAsync() {
-        m_Lifetime?.Dispose();
+        m_Container?.Dispose();
         return AwaitableUtility.CompletedTask;
     }
 }
@@ -462,7 +498,7 @@ var bar = Application.Get<SingletonBar>();
 app.Dispose();
 ```
 
-All Buttr containers — application, scope, and standalone — automatically dispose any registered type that implements `IDisposable` when the container itself is disposed. The pattern is: a Loader builds the container, stores the returned lifetime or container reference, and disposes it in `UnloadAsync`. This ensures Mediators, Services, and any other type with cleanup logic are handled without manual disposal.
+All Buttr containers — application, scope, and standalone — automatically dispose any registered type that implements `IDisposable` when the container itself is disposed. The pattern is: a Loader builds the container, stores the returned container reference, and disposes it in `UnloadAsync`. This ensures Mediators, Services, and any other type with cleanup logic are handled without manual disposal.
 
 ## Scoped Containers
 
@@ -480,8 +516,8 @@ public static class Scopes {
 ```csharp
 var builder = new ScopeBuilder(Scopes.Inventory);
 
-builder.AddTransient<IFoo, Foo>();
-builder.AddSingleton<Bar>();
+builder.Resolvers.AddTransient<IFoo, Foo>();
+builder.Resolvers.AddSingleton<Bar>();
 
 var container = builder.Build();
 
