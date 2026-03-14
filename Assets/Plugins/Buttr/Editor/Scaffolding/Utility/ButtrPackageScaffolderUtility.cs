@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Text;
+using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
 
@@ -28,9 +31,12 @@ namespace Buttr.Editor.Scaffolding {
             if (string.IsNullOrEmpty(relative))
                 return $"{rootNs}.{packageName}";
 
-            var middle = relative.Replace('/', '.').Replace('\\', '.');
 
-            return $"{rootNs}.{middle}.{packageName}";
+            var safeName = SanitiseTypeName(packageName);
+            var middle = relative.Replace('/', '.').Replace('\\', '.');
+            var safeMiddle = SanitiseNamespace(middle);
+
+            return $"{rootNs}.{safeMiddle}.{safeName}";
         }
 
         /// <summary>
@@ -54,7 +60,9 @@ namespace Buttr.Editor.Scaffolding {
                 }
             }
 
-            return Path.GetFileName(Path.GetDirectoryName(Application.dataPath))?.Replace(" ", "") ?? "Project";
+            return SanitiseTypeName(
+                Path.GetFileName(Path.GetDirectoryName(Application.dataPath))
+            ) ?? "Project";
         }
 
         /// <summary>
@@ -139,7 +147,7 @@ namespace Buttr.Editor.Scaffolding {
             }
 
             var ns = Path.GetDirectoryName(packageRoot).ResolveNamespace(name);
-            return (ns, name);
+            return (SanitiseNamespace(ns), SanitiseTypeName(name));
         }
 
         /// <summary>
@@ -154,6 +162,53 @@ namespace Buttr.Editor.Scaffolding {
 
             var updated = string.IsNullOrEmpty(existing) ? entry : $"{existing};{entry}";
             EditorPrefs.SetString("Buttr.PendingAssets", updated);
+        }
+
+        /// <summary>
+        /// Sanitises a string into a valid C# identifier.
+        /// Strips invalid characters, PascalCases on word boundaries (hyphens, spaces, underscores).
+        /// </summary>
+        private static readonly Regex InvalidIdentifierChars = new(@"[^\p{L}\p{Nd}_]", RegexOptions.Compiled);
+        private static readonly Regex WordBoundary = new(@"[-_\s.]+(.)", RegexOptions.Compiled);
+        private static readonly Regex LeadingInvalid = new(@"^[^a-zA-Z_]+", RegexOptions.Compiled);
+
+        /// <summary>
+        /// Sanitises a raw string into a valid PascalCase C# type name.
+        /// </summary>
+        internal static string SanitiseTypeName(string raw) {
+            if (string.IsNullOrWhiteSpace(raw)) return "Default";
+
+            // PascalCase on word boundaries (hyphens, underscores, spaces, dots)
+            var pascalCased = WordBoundary.Replace(raw, m => m.Groups[1].Value.ToUpper());
+
+            // Stripping anything that isn't a letter, digit, or underscore
+            var stripped = InvalidIdentifierChars.Replace(pascalCased, string.Empty);
+
+            // Ensuring it starts with a letter or underscore
+            stripped = LeadingInvalid.Replace(stripped, string.Empty);
+
+            if (stripped.Length == 0) return "Default";
+
+            // Ensuring first character is uppercase
+            return char.ToUpper(stripped[0]) + stripped[1..];
+        }
+
+        /// <summary>
+        /// Sanitises a dotted namespace string by sanitising each segment individually.
+        /// </summary>
+        internal static string SanitiseNamespace(string raw) {
+            if (string.IsNullOrWhiteSpace(raw)) return "Project";
+
+            var segments = raw.Split('.');
+            var results = new List<string>(segments.Length);
+
+            foreach (var segment in segments) {
+                var sanitised = SanitiseTypeName(segment);
+                if (sanitised != "Default" || segment.Trim().Length > 0)
+                    results.Add(sanitised);
+            }
+
+            return results.Count == 0 ? "Project" : string.Join(".", results);
         }
     }
 }
