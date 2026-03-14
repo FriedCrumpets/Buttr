@@ -19,8 +19,8 @@ namespace Buttr.Core {
             m_Resolvers.Resolve();
             
             var cleanup = m_Cleanup is not null
-                ? new DisposableCollection(new IDisposable[] { m_Cleanup, m_Resolvers, m_Hidden, new Disposable(ScopeRegistry.Clear) })
-                : new DisposableCollection(new IDisposable[] { m_Resolvers, m_Hidden, new Disposable(ScopeRegistry.Clear) });
+                ? new DisposableCollection(new IDisposable[] { m_Cleanup, m_Resolvers, m_Hidden })
+                : new DisposableCollection(new IDisposable[] { m_Resolvers, m_Hidden });
 
             return new ApplicationContainer(cleanup);
         }

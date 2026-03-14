@@ -3,7 +3,7 @@
   "version": "2.0.0",
   "displayName": "Buttr",
   "description": "A lightweight DI framework, built for Unity",
-  "unity": "6000",
+  "unity": "6000.0",
   "unityRelease": "0b1",
   "documentationUrl": "https://github.com/FriedCrumpets/Buttr/blob/main/Assets/Plugins/Buttr/README.md",
   "changelogUrl": "https://github.com/FriedCrumpets/Buttr/blob/main/Assets/Plugins/Buttr/CHANGELOG.md",
