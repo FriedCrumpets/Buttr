@@ -7,31 +7,31 @@ namespace Buttr.Editor.Tests.Scaffolding {
         [Test]
         public void Generate_UsesIdAndControllerTypes() {
             var result = new ButtrRegistryTemplate("MyGame.Features.Combat", "Combat").Generate();
-            Assert.That(result, Does.Contain("Dictionary<CombatId, CombatController>"));
+            Assert.That(result, Does.Contain("Dictionary<EntityId, CombatController>"));
         }
 
         [Test]
         public void Generate_RegisterReturnsIDisposable() {
             var result = new ButtrRegistryTemplate("MyGame.Features.Combat", "Combat").Generate();
-            Assert.That(result, Does.Contain("public IDisposable Register(CombatId id, CombatController entry)"));
+            Assert.That(result, Does.Contain("public IDisposable Register(EntityId id, CombatController entry)"));
         }
 
         [Test]
         public void Generate_HasTryGetMethod() {
             var result = new ButtrRegistryTemplate("MyGame.Features.Combat", "Combat").Generate();
-            Assert.That(result, Does.Contain("public bool TryGet(CombatId id, out CombatController entry)"));
+            Assert.That(result, Does.Contain("public bool TryGet(EntityId id, out CombatController entry)"));
         }
 
         [Test]
         public void Generate_HasGetMethod() {
             var result = new ButtrRegistryTemplate("MyGame.Features.Combat", "Combat").Generate();
-            Assert.That(result, Does.Contain("public CombatController Get(CombatId id)"));
+            Assert.That(result, Does.Contain("public CombatController Get(EntityId id)"));
         }
 
         [Test]
         public void Generate_DeregisterIsPrivate() {
             var result = new ButtrRegistryTemplate("MyGame.Features.Combat", "Combat").Generate();
-            Assert.That(result, Does.Contain("private void Deregister(CombatId id)"));
+            Assert.That(result, Does.Contain("private void Deregister(EntityId id)"));
         }
 
         [Test]

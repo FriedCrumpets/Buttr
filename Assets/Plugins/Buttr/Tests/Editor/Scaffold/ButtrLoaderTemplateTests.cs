@@ -23,9 +23,9 @@ namespace Buttr.Editor.Tests.Scaffolding {
         }
 
         [Test]
-        public void Generate_Core_StoresApplicationLifetime() {
+        public void Generate_Core_StoresApplicationContainer() {
             var result = new ButtrLoaderTemplate("MyGame", "MyGame.Core.Audio", "Audio", PackageType.Core).Generate();
-            Assert.That(result, Does.Contain("ApplicationLifetime m_Lifetime"));
+            Assert.That(result, Does.Contain("ApplicationContainer m_Container"));
         }
 
         [Test]

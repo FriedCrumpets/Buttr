@@ -64,15 +64,15 @@ namespace Buttr.Editor.Tests.Scaffolding {
         }
 
         [Test]
-        public void AddViewCommand_CreatesMonoBehavioursFolder() {
+        public void AddViewCommand_CreatesComponentsFolder() {
             new AddViewCommand(m_PackageRoot, false).Execute();
-            Assert.That(Directory.Exists(Path.Combine(m_PackageRoot, "MonoBehaviours")), Is.True);
+            Assert.That(Directory.Exists(Path.Combine(m_PackageRoot, "Components")), Is.True);
         }
 
         [Test]
         public void AddViewCommand_CreatesViewFile() {
             new AddViewCommand(m_PackageRoot, false).Execute();
-            Assert.That(File.Exists(Path.Combine(m_PackageRoot, "MonoBehaviours", "InventoryView.cs")), Is.True);
+            Assert.That(File.Exists(Path.Combine(m_PackageRoot, "Components", "InventoryView.cs")), Is.True);
         }
 
         [Test]

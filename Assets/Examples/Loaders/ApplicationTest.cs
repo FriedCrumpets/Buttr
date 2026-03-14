@@ -5,11 +5,7 @@ using UnityEngine;
 
 namespace Buttr.Core {
     // [CreateAssetMenu(fileName = "UnityContainer", menuName = "Buttr/Examples/Loaders/Container", order = 0)]
-<<<<<<<< HEAD:Assets/Examples/Loaders/ApplicationTest.cs
-    public sealed class ApplicationTest : UnityApplicationLoaderBase {
-========
     public sealed class ApplicationTestLoader : UnityApplicationLoaderBase {
->>>>>>>> main:Assets/Examples/Loaders/ApplicationTestLoader.cs
         private ApplicationContainer m_App;
 
         public override Awaitable LoadAsync(CancellationToken cancellationToken) {

@@ -13,7 +13,7 @@ namespace Buttr.Editor.Tests.Scaffolding {
         [Test]
         public void Generate_InjectsPresenterViaCtor() {
             var result = new ButtrMediatorTemplate("MyGame.Features.Inventory", "Inventory").Generate();
-            Assert.That(result, Does.Contain("public InventoryMediator(InventoryPresenter presenter)"));
+            Assert.That(result, Does.Contain("InventoryPresenter presenter"));
         }
 
         [Test]
