@@ -54,7 +54,6 @@
 
 .buttr-logo {
     flex-grow: 0;
-    background-image: url("project://database/Assets/Plugins/Buttr/Editor/SetupWizard/Images/Logo-simple.svg?fileID=7388822144124034973&guid=4635133cb527a0f40ab117dd328f31c8&type=3#Logo-simple");
     background-color: rgba(0, 0, 0, 0);
     display: flex;
     align-items: center;

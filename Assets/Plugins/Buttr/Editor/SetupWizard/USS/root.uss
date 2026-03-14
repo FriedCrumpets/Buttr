@@ -24,7 +24,7 @@
 
 .logo-wordmark {
     width: 180px;
-    height: 60px; /* Adjust based on your asset aspect ratio */
+    height: 60px; 
     -unity-background-scale-mode: scale-to-fit;
     margin-bottom: var(--spacing-standard);
 }
@@ -38,7 +38,7 @@
 .step-node {
     width: 12px;
     height: 12px;
-    border-radius: 6px; /* Circle */
+    border-radius: 6px;
     border-width: 1px;
     border-color: var(--color-text-muted);
     margin: 0 15px;
@@ -52,7 +52,6 @@
 .step-node--complete {
     background-color: transparent;
     border-color: var(--color-accent-gold);
-    /* Use a background-image for the checkmark here */
 }
 
 /*  ///////////////////////// */
@@ -71,9 +70,6 @@
     height: 2px;
     background-color: var(--color-accent-gold);
     margin-bottom: var(--spacing-standard);
-    /* If using the actual trace graphic: */
-    /* background-image: url('circuit-trace.png'); */
-    /* -unity-background-image-tint-color: var(--color-accent-gold); */
 }
 
 .btn-flat {
@@ -86,7 +82,7 @@
 
 .btn-primary {
     background-color: var(--color-accent-gold);
-    color: #1A1A1A; /* Dark text for high contrast on gold */
+    color: #1A1A1A;
 }
 
 .btn-primary:hover {
@@ -122,7 +118,7 @@
 
 /* Custom Toggle Styling */
 .unity-toggle__checkmark {
-    border-radius: 0; /* Forced flat */
+    border-radius: 0; 
     background-color: var(--color-bg-darker);
     border-color: var(--color-border);
 }
@@ -143,7 +139,6 @@
 
 .log-entry {
     font-size: 11px;
-    -unity-font-definition: url('YourMonospaceFont.ttf');
     color: var(--color-text-body);
     margin-bottom: 2px;
 }
