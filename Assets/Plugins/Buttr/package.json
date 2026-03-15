@@ -5,8 +5,8 @@
   "description": "A lightweight DI framework, built for Unity",
   "unity": "6000.0",
   "unityRelease": "0b1",
-  "documentationUrl": "https://github.com/FriedCrumpets/Buttr/blob/main/Assets/Plugins/Buttr/README.md",
-  "changelogUrl": "https://github.com/FriedCrumpets/Buttr/blob/main/Assets/Plugins/Buttr/CHANGELOG.md",
+  "documentationUrl": "https://github.com/Crumpet-Labs/Buttr/blob/main/Assets/Plugins/Buttr/README.md",
+  "changelogUrl": "https://github.com/Crumpet-Labs/Buttr/blob/main/Assets/Plugins/Buttr/CHANGELOG.md",
   "license": "MIT",
   "category": "Dependency Injection",
   "dependencies": { },
@@ -20,7 +20,7 @@
     "Scaffolding"
   ], 
   "author": {
-    "name": "Jamie Mullis",
-    "url": "https://www.jamiemullis.com"
+    "name": "Crumpet Labs",
+    "url": "https://www.crumpetlabs.co.uk"
   }
 }
