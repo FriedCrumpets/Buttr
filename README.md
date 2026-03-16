@@ -1,6 +1,6 @@
 <p align="center">
   <!-- Replace with actual logo path -->
-  <img src="Docs/Images/buttr-wordmark.svg" alt="Buttr Logo" width="400"/>
+  <img src="Assets/Docs/Images/buttr-wordmark.svg" alt="Buttr Logo" width="400"/>
 </p>
 
 <p align="center">
@@ -65,11 +65,6 @@ Download the latest `.unitypackage` from the [Releases](https://github.com/Crump
 ### Setup Wizard
 
 After installing Buttr, the setup wizard will appear automatically when you open Unity.
-
-<!-- Replace with actual screenshot -->
-<p align="center">
-  <img src="docs/images/setup-wizard.png" alt="Buttr Setup Wizard" width="450"/>
-</p>
 
 The wizard displays your project name, Unity version, and Buttr version. Click **Quick Setup** and Buttr will scaffold the following structure in your `Assets` folder:
 
