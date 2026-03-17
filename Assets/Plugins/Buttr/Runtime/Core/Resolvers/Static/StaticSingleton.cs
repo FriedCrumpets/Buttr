@@ -22,6 +22,12 @@ namespace Buttr.Core {
         public override object Resolve() {
             if (null != m_Instance) return m_Instance;
 
+            if (m_FactoryOverride != null) {
+                m_Instance = m_Configuration(m_FactoryOverride());
+                m_IsResolved = true;
+                return m_Instance;
+            }
+            
             var dependencies = ArrayPool<object>.Get(requirements.Length);
             if(requirements.Length > 0 ) {
                 
@@ -35,10 +41,9 @@ namespace Buttr.Core {
                     }
 
                     throw new ObjectResolverException(
-                          $"Failed to resolve dependencies for {typeof(TConcrete)}.\n" +
-                          $"  Required: [{string.Join(", ", names)}]\n" +
-                          $"  Inner: {ex.Message}\n" +
-                          $"  Stack Trace: {ex.StackTrace}");
+                        $"Failed to resolve dependencies for {typeof(TConcrete)}.\n" +
+                        $"  Required: [{string.Join(", ", names)}]\n" +
+                        $"  Inner: {ex.Message}\n");
                 }
                 
                 if (dependencies.TryValidate(requirements) == false) {
