@@ -28,15 +28,17 @@ namespace Buttr.Core {
                 try {
                     ApplicationRegistry.GetDependencies(requirements, dependencies);
                 }
-                catch (Exception _) {
-                    var array = ArrayPool<string>.Get(requirements.Length);
-                    
+                catch (Exception ex) {
+                    var names = new string[requirements.Length];
                     for (var i = 0; i < requirements.Length; i++) {
-                        var requirement = requirements[i];
-                        array[i] = requirement.FullName;
+                        names[i] = requirements[i].FullName;
                     }
-                    
-                    throw new ObjectResolverException($"Potential cyclic dependency located in {typeof(TConcrete)}: See dependencies: {JsonUtility.ToJson(array)}");
+
+                    throw new ObjectResolverException(
+                          $"Failed to resolve dependencies for {typeof(TConcrete)}.\n" +
+                          $"  Required: [{string.Join(", ", names)}]\n" +
+                          $"  Inner: {ex.Message}\n" +
+                          $"  Stack Trace: {ex.StackTrace}");
                 }
                 
                 if (dependencies.TryValidate(requirements) == false) {
